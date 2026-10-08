@@ -254,8 +254,40 @@
     Array.prototype.forEach.call(document.querySelectorAll("#tabs button"), function (b) {
       b.className = b.dataset.key === key ? "active" : "";
     });
+    renderExplain(key);
     buildParams();
     render();
+  }
+
+  // ---- 解説パネル(content.js のコンテンツを描画) ----
+  function renderExplain(key) {
+    var c = window.IndicatorContent[key];
+    var box = document.getElementById("explain");
+    document.getElementById("explain-title").textContent = c.title;
+
+    var html = "";
+    html += '<p><span class="tag">' + c.tag + '</span></p>';
+    html += '<p class="lead">' + c.lead + '</p>';
+    html += '<h2>計算式</h2><div class="formula">' + escapeHtml(c.formula) + '</div>';
+    html += '<p>' + c.explain + '</p>';
+    html += '<h2>' + c.cmp.caption + '</h2><div class="table-scroll"><table class="cmp">';
+    html += "<tr>" + c.cmp.headers.map(function (h) { return "<th>" + h + "</th>"; }).join("") + "</tr>";
+    c.cmp.rows.forEach(function (r) {
+      html += "<tr><th>" + r[0] + "</th>";
+      if (r.length === 2) {
+        html += '<td colspan="' + (c.cmp.headers.length - 1) + '">' + r[1] + "</td>";
+      } else {
+        html += r.slice(1).map(function (cell) { return "<td>" + cell + "</td>"; }).join("");
+      }
+      html += "</tr>";
+    });
+    html += "</table></div>";
+    html += '<h2>よくある誤解</h2><div class="card"><p style="margin:0">' + c.myth + "</p></div>";
+    box.innerHTML = html;
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
   function buildParams() {
@@ -326,6 +358,7 @@
     if (q && DEFS[q]) state.indicator = q;
 
     buildTabs();
+    renderExplain(state.indicator);
     buildParams();
 
     document.getElementById("mode").addEventListener("change", function (e) {

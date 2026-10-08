@@ -1,19 +1,15 @@
 # テクニカル指標学習アプリ (tti)
 
-7つのテクニカル指標(RSI・CCI・MACD・ADX・BOLL・ATR・VWMA)を「目的別に整理して理解する」ためのインタラクティブな学習用Webアプリ。仕様は [spec.md](spec.md) を参照。
+7つのテクニカル指標(RSI・CCI・MACD・ADX・BOLL・ATR・VWMA)を「目的別に整理して理解する」ためのインタラクティブな学習用Webアプリ。
 
 ## ページ構成
 
 | ファイル | 内容 |
 |---|---|
 | `index.html` | 分類ダッシュボード(7指標をトレンド系・オシレーター系・ボラティリティ系・出来高系の4カテゴリで表示) |
-| `rsi.html`, `cci.html` | オシレーター系の詳細ページ |
-| `macd.html`, `adx.html` | トレンド系の詳細ページ |
-| `boll.html`, `atr.html` | ボラティリティ系の詳細ページ |
-| `vwma.html` | 出来高系の詳細ページ |
-| `simulator.html` | シミュレーター(タブで指標切替、詳細ページからリンク) |
+| `simulator.html` | シミュレーター。タブで指標を切替、`?indicator=rsi` のように直接指定も可。各指標の解説(計算式・比較表・よくある誤解)は折りたたみパネルに表示 |
 
-各詳細ページには計算式、類似指標の比較表(RSI vs CCI / BOLL vs ATR / MACD vs ADX / VWMA vs SMA)、「よくある誤解」の解説を含む。
+ダッシュボードの各カードから `simulator.html?indicator=<key>` へ直接遷移する。
 
 ## シミュレーター
 
@@ -22,6 +18,7 @@
 - パラメータをスライダーで変更すると指標ラインがリアルタイム変化(debounce 200ms)
 - 2ペイン構成のChart.jsチャート(価格 + 指標、hover連動)
 - 補助ライン(シグナルライン、ヒストグラム、±2σ、±DI、比較SMAなど)をすべて表示
+- 解説パネルに各指標の計算式・比較表(RSI vs CCI / BOLL vs ATR / MACD vs ADX / VWMA vs SMA)・「よくある誤解」を表示(コンテンツは `assets/js/content.js`)
 
 ## 起動方法
 
@@ -41,13 +38,18 @@ cd /home/masasikatano/project/tti
 npx serve .
 ```
 
-その後ブラウザで `http://localhost:8000/` を開き、トップページ `index.html`(ダッシュボード)が表示されます。ナビゲーションから各詳細ページや `simulator.html`(シミュレーター)へ移動できます。
+その後ブラウザで `http://localhost:8000/` を開き、トップページ `index.html`(ダッシュボード)が表示されます。
 
 ## 技術構成
 
 - 純粋なHTML/CSS/JS(フレームワーク・ビルドツール不使用)
 - Chart.js はCDNから読み込み
 - `assets/css/style.css` — ハンドメイドCSS
-- `assets/js/` — `charts.js`(2ペイン連動チャート)、`data.js`(疑似生成・実データ)、`indicators.js`(指標計算)、`simulator.js`(UI)
+- `assets/js/`
+  - `indicators.js` — SMA/EMA と7指標の計算
+  - `charts.js` — 2ペイン連動チャート
+  - `data.js` — 疑似ランダムウォーク生成・実データ読み込み
+  - `content.js` — 各指標の解説コンテンツ(計算式・比較表・誤解)
+  - `simulator.js` — タブ・スライダー・データモード制御と描画
 - 日本語UI・レスポンシブ対応
 - HTTP配信前提(GitHub Pages公開予定)。`file://` では開かない想定

@@ -59,12 +59,18 @@
     <div style="position:relative;height:240px"><canvas id="indicatorChart"></canvas></div>
   </div>
 
+  <details class="card" id="explain-wrap" open>
+    <summary><h3 id="explain-title" style="display:inline">指標の解説</h3></summary>
+    <div id="explain"></div>
+  </details>
+
   <div class="notice">
     実データモードでは、元データが日次終値のみのため High/Low/出来高 は終値から疑似生成しています。ATR/CCI/ADX/BOLL/VWMAなどこれらに依存する指標の水準は参考値として扱ってください。
   </div>
 </div>
 <footer>Indicator Lab — 個人学習用。投資助言ではありません。</footer>
 <script src="assets/js/data.js"></script>
+<script src="assets/js/content.js"></script>
 <script src="assets/js/indicators.js"></script>
 <script src="assets/js/charts.js"></script>
 <script src="assets/js/simulator.js"></script>
