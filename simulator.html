@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>シミュレーター — Indicator Lab</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="brand" href="index.html">Indicator Lab</a>
+    <nav>
+      <a href="index.html">ダッシュボード</a>
+      <a href="simulator.html">シミュレーター</a>
+    </nav>
+  </div>
+</header>
+<div class="wrap">
+  <h1>インタラクティブ・シミュレーター</h1>
+  <p class="lead">指標タブを切り替え、パラメータをスライダーで動かすと指標ラインがリアルタイムに変わります(入力は約200msのdebounce後に再計算)。上ペインが価格、下ペインが指標で、hover・tooltip・x軸範囲が連動します。</p>
+
+  <div class="card">
+    <div class="sim-toolbar">
+      <label>データモード
+        <select id="mode">
+          <option value="random">疑似ランダムウォーク(デフォルト)</option>
+          <option value="real">実データ(S&P500/TOPIX/債券)</option>
+        </select>
+      </label>
+      <span id="series-wrap" style="display:none">
+        <label>系列
+          <select id="series">
+            <option value="us_sp500">S&P500相当(eMAXIS Slim 米国株式)</option>
+            <option value="jp_topix">TOPIX相当(eMAXIS Slim 国内株式)</option>
+            <option value="global_bond">グローバル債券相当</option>
+          </select>
+        </label>
+      </span>
+      <button id="regen" class="primary" type="button">データ再生成</button>
+    </div>
+    <div id="data-notice" class="notice" style="display:none"></div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="card">
+    <h3 style="margin-top:0">パラメータ</h3>
+    <div class="params" id="params"></div>
+  </div>
+
+  <div class="chart-box">
+    <h3>上ペイン:価格</h3>
+    <div style="position:relative;height:320px"><canvas id="priceChart"></canvas></div>
+  </div>
+  <div class="chart-box">
+    <h3>下ペイン:指標</h3>
+    <div style="position:relative;height:240px"><canvas id="indicatorChart"></canvas></div>
+  </div>
+
+  <div class="notice">
+    実データモードでは、元データが日次終値のみのため High/Low/出来高 は終値から疑似生成しています。ATR/CCI/ADX/BOLL/VWMAなどこれらに依存する指標の水準は参考値として扱ってください。
+  </div>
+</div>
+<footer>Indicator Lab — 個人学習用。投資助言ではありません。</footer>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/indicators.js"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/simulator.js"></script>
+</body>
+</html>

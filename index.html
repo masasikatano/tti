@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Indicator Lab — テクニカル指標学習ダッシュボード</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="brand" href="index.html">Indicator Lab</a>
+    <nav>
+      <a href="index.html">ダッシュボード</a>
+      <a href="simulator.html">シミュレーター</a>
+    </nav>
+  </div>
+</header>
+<div class="wrap">
+  <h1>テクニカル指標学習ダッシュボード</h1>
+  <p class="lead">7つの指標を「何を測るか」の目的別に4カテゴリに分類しました。各カードから詳細ページ、詳細ページからシミュレーターへ進めます。</p>
+
+  <p class="cat-title">トレンド系(方向とその強さ)</p>
+  <div class="grid">
+    <div class="card">
+      <h3><span class="tag">トレンド系</span><a href="adx.html">ADX</a></h3>
+      <div class="row"><span class="lbl">何を測るか:</span>トレンドの「強さ」(方向は測らない)</div>
+      <div class="row"><span class="lbl">典型値:</span>25以上でトレンド成立目安、20以下はレンジ</div>
+      <div class="row"><span class="lbl">よくある見方:</span>+DI/-DIの上下で方向を判断する</div>
+    </div>
+    <div class="card">
+      <h3><span class="tag">トレンド系</span><a href="macd.html">MACD</a></h3>
+      <div class="row"><span class="lbl">何を測るか:</span>2本のEMAの差によるトレンドの転換</div>
+      <div class="row"><span class="lbl">典型値:</span>ゼロライン、MACDとシグナルのクロス</div>
+      <div class="row"><span class="lbl">よくある見方:</span>ヒストグラムの伸縮で勢いを見る</div>
+    </div>
+  </div>
+
+  <p class="cat-title">オシレーター系(過熱・逆行の目安)</p>
+  <div class="grid">
+    <div class="card">
+      <h3><span class="tag">オシレーター系</span><a href="rsi.html">RSI</a></h3>
+      <div class="row"><span class="lbl">何を測るか:</span>一定期間の値上がり/値下がりの割合(0〜100)</div>
+      <div class="row"><span class="lbl">典型値:</span>70以上は過熱、30以下は売られすぎの目安</div>
+      <div class="row"><span class="lbl">よくある見方:</span>トレンドの勢いの強弱を見る補助指標</div>
+    </div>
+    <div class="card">
+      <h3><span class="tag">オシレーター系</span><a href="cci.html">CCI</a></h3>
+      <div class="row"><span class="lbl">何を測るか:</span>典型価が平均からどれだけ乖離したか</div>
+      <div class="row"><span class="lbl">典型値:</span>±100を外れると過熱/売られすぎの目安</div>
+      <div class="row"><span class="lbl">よくある見方:</span>トレンド発生初期の勢いを捉える指標</div>
+    </div>
+  </div>
+
+  <p class="cat-title">ボラティリティ系(変動の大きさ)</p>
+  <div class="grid">
+    <div class="card">
+      <h3><span class="tag">ボラティリティ系</span><a href="boll.html">ボリンジャーバンド(BOLL)</a></h3>
+      <div class="row"><span class="lbl">何を測るか:</span>移動平均±σによる変動の「幅」</div>
+      <div class="row"><span class="lbl">典型値:</span>バンドタッチ、スクイーズ(収縮)の崩れ</div>
+      <div class="row"><span class="lbl">よくある見方:</span>バンドの広がり/縮みで相場の状態を見る</div>
+    </div>
+    <div class="card">
+      <h3><span class="tag">ボラティリティ系</span><a href="atr.html">ATR</a></h3>
+      <div class="row"><span class="lbl">何を測るか:</span>1日あたりの値幅(方向を持たない)</div>
+      <div class="row"><span class="lbl">典型値:</span>ストップロス距離やポジションサイズの目安</div>
+      <div class="row"><span class="lbl">よくある見方:</span>ボラティリティの絶対量としてリスク管理に使う</div>
+    </div>
+  </div>
+
+  <p class="cat-title">出来高系</p>
+  <div class="grid">
+    <div class="card">
+      <h3><span class="tag">出来高系</span><a href="vwma.html">VWMA</a></h3>
+      <div class="row"><span class="lbl">何を測るか:</span>出来高加重の移動平均(出来高の多い日ほど重み)</div>
+      <div class="row"><span class="lbl">典型値:</span>通常のSMAより「出来高の確認」を伴う平均</div>
+      <div class="row"><span class="lbl">よくある見方:</span>SMAとの乖離で出来高を伴った流れを見る</div>
+    </div>
+  </div>
+
+  <h2>まとめて試す</h2>
+  <div class="card">
+    <p style="margin:0"><a href="simulator.html">インタラクティブ・シミュレーター</a>では、7指標すべてをパラメータを変えながらリアルタイムに確認できます。疑似ランダムウォーク生成データ(デフォルト)と、S&P500相当・TOPIX相当・グローバル債券相当の実データ(約10年)を切り替えられます。</p>
+  </div>
+</div>
+<footer>Indicator Lab — 個人学習用。投資助言ではありません。</footer>
+</body>
+</html>

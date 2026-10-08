@@ -48,7 +48,7 @@
 
 ## 出力先・運用
 
-- 新規プロジェクトディレクトリ: `/home/masasikatano/project/indicator-lab/`
+- 新規プロジェクトディレクトリ: `/home/masasikatano/project/tti/`
 - GitHub Pagesで公開予定(個人利用のみ)
 - 管理画面は不要
 

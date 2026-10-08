@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATR — Indicator Lab</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header"><div class="inner">
+  <a class="brand" href="index.html">Indicator Lab</a>
+  <nav><a href="index.html">ダッシュボード</a><a href="simulator.html">シミュレーター</a></nav>
+</div></header>
+<div class="wrap">
+  <p><span class="tag">ボラティリティ系</span></p>
+  <h1>ATR(平均真実範囲)</h1>
+  <p class="lead">「1日あたりどれくらい動くか」の値幅の平均。方向を持たないボラティリティ指標。</p>
+
+  <h2>計算式</h2>
+  <div class="formula">TR(真実範囲) = max(高値−安値, |高値−前日終値|, |安値−前日終値|)
+ATR = TR の n 日平均
+
+※平滑化方式は2種類対応:「SMA」(単純平均)または「Wilder」(前日のATR×(n−1)+当日TR)÷n。
+デフォルトは期間14・Wilder。</div>
+  <p>平易に言うと:「窓あき(ギャップ)を含めた、1日の実際の値幅」を平均したものです。前日終値から大きく飛んだ日も値幅に正しく含まれるのが特徴です。高値・安値が必要なため、終値だけのデータでは正確に計算できません。</p>
+
+  <h2>BOLL vs ATR</h2>
+  <div class="table-scroll">
+  <table class="cmp">
+    <tr><th></th><th>BOLL</th><th>ATR</th></tr>
+    <tr><th>測るもの</th><td>価格の変動「幅」を価格チャート上のバンドで表示</td><td>1日あたりの値幅(TR)の平均という単一の数値</td></tr>
+    <tr><th>出力の形</th><td>中心線+上下バンドの3ライン(チャートに重ねる)</td><td>1本のライン(単位は価格。一般的には単独の指標枠)</td></tr>
+    <tr><th>得意な場面</th><td>レンジの上下限、スクイーズ(収縮)からのブレイク検出</td><td>損切り距離・決済目標・ポジションサイズの算出</td></tr>
+    <tr><th>価格との関係</th><td>バンド自体が価格に追随する(相対的な位置関係が見える)</td><td>価格そのものではなく「値幅の絶対量」</td></tr>
+    <tr><th>共通点</th><td colspan="2">どちらもボラティリティ指標で、値動きの大きさが変化したことを捉える</td></tr>
+  </table>
+  </div>
+
+  <h2>よくある誤解</h2>
+  <div class="card">
+    <p style="margin:0">「ATRが高い=上昇」は誤りです。ATRは方向を持たず、ボラティリティの絶対量のみを示します。ATRが高いのは「大きく動いている」という意味であり、上でも下でも高くなります。リスク管理(損切り幅など)に使うのが本来の用途です。</p>
+  </div>
+
+  <h2>シミュレーターで試す</h2>
+  <p><a href="simulator.html?indicator=atr">→ ATRをシミュレーターで試す(期間14・Wilderがデフォルト。SMA平滑化も選択可)</a></p>
+  <p><a href="boll.html">前:ボリンジャーバンドの解説へ</a> / <a href="vwma.html">次:VWMA の解説へ</a></p>
+</div>
+<footer>Indicator Lab — 個人学習用。投資助言ではありません。</footer>
+</body>
+</html>

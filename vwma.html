@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VWMA — Indicator Lab</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header"><div class="inner">
+  <a class="brand" href="index.html">Indicator Lab</a>
+  <nav><a href="index.html">ダッシュボード</a><a href="simulator.html">シミュレーター</a></nav>
+</div></header>
+<div class="wrap">
+  <p><span class="tag">出来高系</span></p>
+  <h1>VWMA(出来高加重移動平均)</h1>
+  <p class="lead">出来高の多い日ほど重みを大きくした移動平均。出来高を伴った平均水準を示す。</p>
+
+  <h2>計算式</h2>
+  <div class="formula">VWMA = Σ(終値 × 出来高) ÷ Σ(出来高)   (過去n日分)
+
+※通常のSMAは Σ終値 ÷ n で、どの日も重みが同じ。VWMAは出来高の多い日の終値が
+平均を強く引っ張る。比較用SMAを同じ期間で重ねると差が分かりやすい。
+デフォルトは期間20(比較SMAも20)。</div>
+  <p>平易に言うと:「取引が盛んだった日の値段を大事にした平均」です。出来高が偏る銘柄(情報発表で一気に取引が集中するなど)ほど、通常のSMAとの差に意味が出ます。出来高データが必要なため、終値だけのデータでは疑似生成の出高を使う点に注意してください。</p>
+
+  <h2>VWMA vs SMA</h2>
+  <div class="table-scroll">
+  <table class="cmp">
+    <tr><th></th><th>VWMA</th><th>SMA(単純移動平均)</th></tr>
+    <tr><th>重み</th><td>出来高に比例(出来高の多い日ほど重い)</td><td>全ての日が等重み</td></tr>
+    <tr><th>必要なデータ</th><td>終値 + 出来高</td><td>終値のみ</td></tr>
+    <tr><th>反応の特徴</th><td>出来高を伴って動いた時だけ素早く反応</td><td>一定ペースで滑らかに追随</td></tr>
+    <tr><th>向いている銘柄</th><td>出来高が偏る銘柄・イベント駆動の動き</td><td>出来高がほぼ一定の銘柄・指数</td></tr>
+    <tr><th>優劣</th><td colspan="2">どちらが「正確」とは言えない。目的の違う平均であり、乖離そのものが出来高の偏りを示す情報になる</td></tr>
+  </table>
+  </div>
+
+  <h2>よくある誤解</h2>
+  <div class="card">
+    <p style="margin:0">「VWMAがSMAより正確」は限定的です。出来高が偏った銘柄ほど有効ですが、全銘柄で優れるわけではありません。指数のように出来高が比較的安定している対象ではSMAとの差は小さくなりがちです。</p>
+  </div>
+
+  <h2>シミュレーターで試す</h2>
+  <p><a href="simulator.html?indicator=vwma">→ VWMAをシミュレーターで試す(期間20・比較SMA 20がデフォルト)</a></p>
+  <p><a href="atr.html">前:ATR の解説へ</a> / <a href="index.html">ダッシュボードに戻る</a></p>
+</div>
+<footer>Indicator Lab — 個人学習用。投資助言ではありません。</footer>
+</body>
+</html>

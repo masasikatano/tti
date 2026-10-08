@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ADX — Indicator Lab</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header"><div class="inner">
+  <a class="brand" href="index.html">Indicator Lab</a>
+  <nav><a href="index.html">ダッシュボード</a><a href="simulator.html">シミュレーター</a></nav>
+</div></header>
+<div class="wrap">
+  <p><span class="tag">トレンド系</span></p>
+  <h1>ADX(平均方向性指数)</h1>
+  <p class="lead">トレンドが「どれだけ強いか」を0〜100で示す指標。方向そのものは示しません。</p>
+
+  <h2>計算式</h2>
+  <div class="formula">TR = max(高値−安値, |高値−前日終値|, |安値−前日終値|)
++DM = 高値の上昇幅(高値が前日より下がった日は0)
+−DM = 安値の下落幅(安値が前日より上がった日は0)
++DI = 100 × (+DMのWilder平均) ÷ (TRのWilder平均)
+−DI = 100 × (−DMのWilder平均) ÷ (TRのWilder平均)
+DX = 100 × |+DI − −DI| ÷ (+DI + −DI)
+ADX = DX の Wilder 平滑化
+
+※平滑化方式は Wilder 固定。デフォルト期間は14。</div>
+  <p>平易に言うと:「値幅(TR)の中で、一方方向への動き(±DM)がどれだけ支配的か」を連鎖的に平均化したものです。日々の値幅がまちまちでも、一方向に動く日が続くほどADXは上がります。</p>
+
+  <h2>MACD vs ADX</h2>
+  <div class="table-scroll">
+  <table class="cmp">
+    <tr><th></th><th>MACD</th><th>ADX</th></tr>
+    <tr><th>測るもの</th><td>トレンドの「方向」と転換のタイミング</td><td>トレンドの「強さ」だけ(方向は測らない)</td></tr>
+    <tr><th>使うデータ</th><td>終値のみ(EMAの差)</td><td>高値・安値・終値(TRと±DM)</td></tr>
+    <tr><th>出力</th><td>ゼロを中心に振れる正負の値 + シグナル + ヒストグラム</td><td>0〜100の単一の強さの値(+DI/-DIで方向補助)</td></tr>
+    <tr><th>得意な場面</th><td>トレンド転換の早期検出</td><td>レンジかトレンドかの環境判定(フィルター)</td></tr>
+    <tr><th>使い分け</th><td colspan="2">ADXが「今はトレンド相場か?」を確認し、MACDで「どちらに向かっているか・転換したか」を見ると相性が良い</td></tr>
+  </table>
+  </div>
+
+  <h2>よくある誤解</h2>
+  <div class="card">
+    <p style="margin:0">「ADXが高い=上昇トレンド」は誤りです。ADXは方向ではなく「強さ」のみを示す指標で、下落トレンドが強いときもADXは高くなります。方向は+DIと−DIのどちらが上にあるかで判断してください。</p>
+  </div>
+
+  <h2>シミュレーターで試す</h2>
+  <p><a href="simulator.html?indicator=adx">→ ADXをシミュレーターで試す(期間14・Wilder固定)</a></p>
+  <p><a href="macd.html">前:MACD の解説へ</a> / <a href="boll.html">次:ボリンジャーバンドの解説へ</a></p>
+</div>
+<footer>Indicator Lab — 個人学習用。投資助言ではありません。</footer>
+</body>
+</html>
