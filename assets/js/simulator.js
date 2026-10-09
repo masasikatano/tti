@@ -151,11 +151,122 @@
           indTitle: "出来高(※終値由来の疑似生成)"
         };
       }
+    },
+    stoch: {
+      label: "ストキャスティクス",
+      params: [
+        { key: "kPeriod", label: "%K期間", min: 3, max: 30, step: 1, def: 14, hint: "目安: 14日(Lane の標準)。短期化すると反応は速いが、20/80ラインとの絡みでノイズが増える。" },
+        { key: "slowing", label: "%K平滑化", min: 1, max: 10, step: 1, def: 3, hint: "目安: 3日。1にすると生のRSVそのもの(速いが乱れる)。「スローストキャスティクス」はこの値を3にする。" },
+        { key: "dPeriod", label: "%D期間", min: 1, max: 10, step: 1, def: 3, hint: "目安: 3日。%Kの移動平均で、%Kよりも滑らかなシグナルラインとして使う。" }
+      ],
+      priceMode: "separate",
+      fixedY: [0, 100],
+      build: function (d, p) {
+        var r = Indicators.STOCH(d, p.kPeriod, p.slowing, p.dPeriod);
+        return {
+          ind: [
+            Charts.line("%K(" + p.kPeriod + "," + p.slowing + ")", r.k, "#2563eb", { width: 2 }),
+            Charts.line("%D(" + p.dPeriod + ")", r.d, "#dc2626", { width: 1.6 }),
+            Charts.line("上限 80", r.k.map(function () { return 80; }), "#dc2626", { dash: [6, 4], width: 1 }),
+            Charts.line("下限 20", r.k.map(function () { return 20; }), "#16a34a", { dash: [6, 4], width: 1 })
+          ],
+          indTitle: "%K / %D(0〜100)"
+        };
+      }
+    },
+    kdj: {
+      label: "KDJ",
+      params: [
+        { key: "period", label: "期間", min: 3, max: 30, step: 1, def: 9, hint: "目安: 9日(中国市場で一般的な設定)。短期化するとJ線の振幅が激しくなる。" }
+      ],
+      priceMode: "separate",
+      fixedY: [0, 100],
+      build: function (d, p) {
+        var r = Indicators.KDJ(d, p.period);
+        return {
+          ind: [
+            Charts.line("J", r.j, "#7c3aed", { width: 1.4 }),
+            Charts.line("%K(" + p.period + ")", r.k, "#2563eb", { width: 2 }),
+            Charts.line("%D", r.d, "#dc2626", { width: 1.6 }),
+            Charts.line("上限 80", r.k.map(function () { return 80; }), "#dc2626", { dash: [6, 4], width: 1 }),
+            Charts.line("下限 20", r.k.map(function () { return 20; }), "#16a34a", { dash: [6, 4], width: 1 })
+          ],
+          indTitle: "%K / %D / J(0〜100。Jは0〜100の範囲をはみ出すことがある)"
+        };
+      }
+    },
+    cross: {
+      label: "ゴールデンクロス",
+      params: [
+        { key: "short", label: "短期SMA", min: 3, max: 25, step: 1, def: 5, hint: "目安: 5日。短期化するとクロスが早くなるがダマシが増える。" },
+        { key: "long", label: "長期SMA", min: 20, max: 120, step: 5, def: 25, hint: "目安: 25日(日次)。75日/200日などにすると大きな波の転換点を捉える。" }
+      ],
+      priceMode: "overlay",
+      build: function (d, p) {
+        var c = Indicators.closes(d);
+        var s = Indicators.SMA(c, p.short), l = Indicators.SMA(c, p.long);
+        var x = Indicators.CROSS_POINTS(s, l);
+        var grid = s.map(function (v, i) { return v === null || l[i] === null ? null : v - l[i]; });
+        var gc = c.map(function (v, i) { return x.golden.indexOf(i) >= 0 ? v : null; });
+        var dc = c.map(function (v, i) { return x.dead.indexOf(i) >= 0 ? v : null; });
+        return {
+          price: [
+            Charts.line("SMA(" + p.short + ")", s, "#f59e0b", { width: 1.6 }),
+            Charts.line("SMA(" + p.long + ")", l, "#dc2626", { width: 2 }),
+            Charts.points("ゴールデンクロス(▲)", gc, "#16a34a", { radius: 7, style: "triangle" }),
+            Charts.points("デッドクロス(◆)", dc, "#dc2626", { radius: 7, style: "rectRot" })
+          ],
+          ind: [Charts.line("SMA差(短期−長期)", grid, "#2563eb", { width: 1.8 })],
+          indTitle: "SMA差(プラス=短期が上、ゼロクロスがGC/DC)"
+        };
+      }
+    },
+    supertrend: {
+      label: "スーパートレンド",
+      params: [
+        { key: "period", label: "ATR期間", min: 7, max: 14, step: 1, def: 10, hint: "目安: 10日(Seban の標準)。期間を長くすると反転判定が緩やかになる。" },
+        { key: "mult", label: "ATR倍率", min: 1, max: 5, step: 0.5, def: 3, hint: "目安: 3.0(Seban の標準)。小さくすると早く反転するがレンジで頻回に揺れる。" }
+      ],
+      priceMode: "overlay",
+      build: function (d, p) {
+        var r = Indicators.SUPERTREND(d, p.period, p.mult);
+        var up = r.line.map(function (v, i) { return r.dir[i] === 1 ? v : null; });
+        var dn = r.line.map(function (v, i) { return r.dir[i] === -1 ? v : null; });
+        return {
+          price: [
+            Charts.line("スーパートレンド(上昇)", up, "#16a34a", { width: 2 }),
+            Charts.line("スーパートレンド(下降)", dn, "#dc2626", { width: 2 })
+          ],
+          ind: [
+            Charts.bar("方向(+1=上昇, −1=下降)", r.dir.map(function (v) { return v === null ? null : v * 0.5 + 0.5; }), "#94a3b8"),
+            Charts.line("方向", r.dir, "#2563eb", { width: 1.6 })
+          ],
+          indTitle: "トレンド方向(+1=上昇 / −1=下降)"
+        };
+      }
+    },
+    obv: {
+      label: "OBV",
+      params: [
+        { key: "smaPeriod", label: "OBV移動平均", min: 5, max: 60, step: 1, def: 20, hint: "目安: 20日。OBV自体は累積値のため水準ではなく傾きを見る。SMAとのクロスで勢いの転換を確認する使い方。" }
+      ],
+      priceMode: "separate",
+      build: function (d, p) {
+        var r = Indicators.OBV(d);
+        var ma = Indicators.SMA(r, p.smaPeriod);
+        return {
+          ind: [
+            Charts.line("OBV", r, "#2563eb", { width: 1.8 }),
+            Charts.line("OBVのSMA(" + p.smaPeriod + ")", ma, "#dc2626", { width: 1.4 })
+          ],
+          indTitle: "OBV(出来高フローの累積。※出来高は疑似生成のため参考値)"
+        };
+      }
     }
   };
   var GROUPS = [
-    { label: "オシレーター系(過熱・逆行の目安)", keys: ["rsi", "cci"] },
-    { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx", "vwma"] },
+    { label: "オシレーター系(過熱・逆行の目安)", keys: ["rsi", "cci", "stoch", "kdj"] },
+    { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx", "vwma", "cross", "supertrend", "obv"] },
     { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr"] }
   ];
 
@@ -184,7 +295,7 @@
         state.data = r.data;
         state.meta = r.meta;
         notice.innerHTML = "実データモード:「" + r.meta.name + "」(出典: " + r.meta.source +
-          ")の日次終値を使用中。<b>High/Low/出来高は終値から疑似生成しているため</b>、ATR/CCI/ADX/BOLL/VWMAなどの水準は参考値です。";
+          ")の日次終値を使用中。<b>High/Low/出来高は終値から疑似生成しているため</b>、ATR/CCI/ADX/BOLL/VWMA/ストキャスティクス/KDJ/スーパートレンド/OBVなどの水準は参考値です。";
         notice.style.display = "block";
         render();
       }).catch(function (e) {

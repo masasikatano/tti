@@ -18,7 +18,7 @@
 </header>
 <div class="wrap">
   <h1>テクニカル指標学習ダッシュボード</h1>
-  <p class="lead">7つの指標を「何を測るか」の目的別に4カテゴリに分類しました。各カードからシミュレーター(解説+チャート)へ直接進めます。</p>
+  <p class="lead">12の指標を「何を測るか」の目的別に3カテゴリに分類しました。各カードからシミュレーター(解説+チャート)へ直接進めます。</p>
 
   <p class="cat-title">オシレーター系(過熱・逆行の目安)</p>
   <div class="grid">
@@ -33,6 +33,18 @@
       <div class="row"><span class="lbl">何を測るか:</span>典型価が平均からどれだけ乖離したか</div>
       <div class="row"><span class="lbl">典型値:</span>±100を外れると過熱/売られすぎの目安</div>
       <div class="row"><span class="lbl">よくある見方:</span>トレンド発生初期の勢いを捉える指標</div>
+    </div>
+    <div class="card">
+      <h3><span class="tag">オシレーター系</span><a href="simulator.html?indicator=stoch">ストキャスティクス</a></h3>
+      <div class="row"><span class="lbl">何を測るか:</span>終値が直近レンジ内のどの位置にあるか(0〜100)</div>
+      <div class="row"><span class="lbl">典型値:</span>%K/%Dのクロスと80/20の水準で反転を見る</div>
+      <div class="row"><span class="lbl">よくある見方:</span>レンジ相場の上下反転タイミングの判定</div>
+    </div>
+    <div class="card">
+      <h3><span class="tag">オシレーター系</span><a href="simulator.html?indicator=kdj">KDJ</a></h3>
+      <div class="row"><span class="lbl">何を測るか:</span>ストキャスティクスにJ線(勢いの先読み)を加えた指標</div>
+      <div class="row"><span class="lbl">典型値:</span>Jの極端な値(0/100の外側)からの戻りを見る</div>
+      <div class="row"><span class="lbl">よくある見方:</span>%K/%DのクロスをJで確認する使い方</div>
     </div>
   </div>
 
@@ -56,6 +68,24 @@
       <div class="row"><span class="lbl">典型値:</span>通常のSMAより「出来高の確認」を伴う平均</div>
       <div class="row"><span class="lbl">よくある見方:</span>SMAとの乖離で出来高を伴った流れを見る</div>
     </div>
+    <div class="card">
+      <h3><span class="tag">トレンド系</span><a href="simulator.html?indicator=cross">ゴールデンクロス/デッドクロス</a></h3>
+      <div class="row"><span class="lbl">何を測るか:</span>短期SMAと長期SMAのクロスによるトレンド転換</div>
+      <div class="row"><span class="lbl">典型値:</span>5日/25日、50日/200日などの2本組み合わせ</div>
+      <div class="row"><span class="lbl">よくある見方:</span>長期線同士で大きな転換点、短期線で早い検出(ダマシ増)</div>
+    </div>
+    <div class="card">
+      <h3><span class="tag">トレンド系</span><a href="simulator.html?indicator=supertrend">スーパートレンド</a></h3>
+      <div class="row"><span class="lbl">何を測るか:</span>ATRバンドの反転によるトレンド方向(損切位置付き)</div>
+      <div class="row"><span class="lbl">典型値:</span>ATR期間10・倍率3.0が標準</div>
+      <div class="row"><span class="lbl">よくある見方:</span>ライン反転=エントリー、ライン=損切の機械運用</div>
+    </div>
+    <div class="card">
+      <h3><span class="tag">トレンド系</span><a href="simulator.html?indicator=obv">OBV</a></h3>
+      <div class="row"><span class="lbl">何を測るか:</span>値上がり日の出来高を足し値下がり日を引く累積フロー</div>
+      <div class="row"><span class="lbl">典型値:</span>価格とOBVのダイバージェンス(背離)の検出</div>
+      <div class="row"><span class="lbl">よくある見方:</span>出来高を伴った上昇かどうかの裏付け確認</div>
+    </div>
   </div>
 
   <p class="cat-title">ボラティリティ系(変動の大きさ)</p>
@@ -76,7 +106,7 @@
 
   <h2>まとめて試す</h2>
   <div class="card">
-    <p style="margin:0"><a href="simulator.html">インタラクティブ・シミュレーター</a>では、7指標すべてをパラメータを変えながらリアルタイムに確認できます。疑似ランダムウォーク生成データ(デフォルト)と、S&P500相当・TOPIX相当・グローバル債券相当の実データ(約10年)を切り替えられます。</p>
+    <p style="margin:0"><a href="simulator.html">インタラクティブ・シミュレーター</a>では、12指標すべてをパラメータを変えながらリアルタイムに確認できます。疑似ランダムウォーク生成データ(デフォルト)と、S&P500相当・TOPIX相当・グローバル債券相当の実データ(約10年)を切り替えられます。</p>
   </div>
 </div>
 <footer>Indicator Lab — 個人学習用。投資助言ではありません。</footer>

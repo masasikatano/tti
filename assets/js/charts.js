@@ -115,6 +115,17 @@
   function bar(label, data, color) {
     return { type: "bar", label: label, data: data, backgroundColor: hexA(color, 0.55), borderColor: color, borderWidth: 1, yAxisID: "y" };
   }
+  // クロス点など、値がある箇所だけ点を打つ。data は「点のある箇所のみ値、他は null」の配列。
+  function points(label, data, color, opts) {
+    opts = opts || {};
+    return {
+      type: "line", label: label, data: data,
+      borderColor: "rgba(0,0,0,0)", backgroundColor: color,
+      pointRadius: data.map(function (v) { return v === null ? 0 : (opts.radius || 5); }),
+      pointHoverRadius: (opts.radius || 5) + 2,
+      pointStyle: opts.style || "triangle", showLine: false, yAxisID: "y"
+    };
+  }
   function hexA(hex, a) {
     var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
     return "rgba(" + r + "," + g + "," + b + "," + a + ")";
@@ -125,5 +136,5 @@
     return data.map(function (c) { if (base === null && c != null) base = c; return base === null ? null : (c / base - 1) * 100; });
   }
 
-  global.Charts = { create: create, update: update, destroy: destroy, line: line, bar: bar, hexA: hexA, scalePct: scalePct };
+  global.Charts = { create: create, update: update, destroy: destroy, line: line, bar: bar, points: points, hexA: hexA, scalePct: scalePct };
 })(window);

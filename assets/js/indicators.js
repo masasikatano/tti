@@ -188,9 +188,103 @@
     return { vwma: out, sma: SMA(c, smaPeriod || period) };
   }
 
+  // ストキャスティクス: RSV=(C−LLV)/(HHV−LLV)×100、%K=RSVのslowing日SMA、%D=%KのdPeriod日SMA
+  function STOCH(data, kPeriod, slowing, dPeriod) {
+    var h = highs(data), l = lows(data), c = closes(data), n = data.length;
+    var rsv = new Array(n).fill(null);
+    for (var i = kPeriod - 1; i < n; i++) {
+      var hh = -Infinity, ll = Infinity;
+      for (var j = i - kPeriod + 1; j <= i; j++) { if (h[j] > hh) hh = h[j]; if (l[j] < ll) ll = l[j]; }
+      rsv[i] = hh === ll ? 50 : (c[i] - ll) / (hh - ll) * 100;
+    }
+    // RSVのslowing日SMA(先頭は部分平均で埋める)
+    function smaPartial(v, p) {
+      var out = new Array(n).fill(null), sum = 0, cnt = 0;
+      for (var i = 0; i < n; i++) {
+        if (v[i] !== null) { sum += v[i]; cnt++; if (cnt > p) { sum -= v[i - p]; } }
+        if (cnt >= p) out[i] = sum / p;
+        else if (cnt > 0) out[i] = sum / cnt;
+      }
+      return out;
+    }
+    var k = smaPartial(rsv, slowing);
+    var start = k.findIndex(function (v) { return v !== null; });
+    var d = new Array(n).fill(null);
+    if (start >= 0) {
+      var sub = SMA(k.slice(start), dPeriod);
+      for (var i = start; i < n; i++) d[i] = sub[i - start];
+    }
+    return { k: k, d: d };
+  }
+
+  // KDJ: RSVをα=1/3の指数平滑で%K、%D、J=3%K−2%D(中国発のストキャスティクス発展形)
+  function KDJ(data, period) {
+    var h = highs(data), l = lows(data), c = closes(data), n = data.length;
+    var k = new Array(n).fill(null), d = new Array(n).fill(null), j = new Array(n).fill(null);
+    if (n < period) return { k: k, d: d, j: j };
+    var kv = 50, dv = 50;
+    for (var i = 0; i < n; i++) {
+      if (i >= period - 1) {
+        var hh = -Infinity, ll = Infinity;
+        for (var m = i - period + 1; m <= i; m++) { if (h[m] > hh) hh = h[m]; if (l[m] < ll) ll = l[m]; }
+        var rsv = hh === ll ? 50 : (c[i] - ll) / (hh - ll) * 100;
+        kv = (2 * kv + rsv) / 3;
+        dv = (2 * dv + kv) / 3;
+        k[i] = kv; d[i] = dv; j[i] = 3 * kv - 2 * dv;
+      }
+    }
+    return { k: k, d: d, j: j };
+  }
+
+  // スーパートレンド: 基本バンド=(H+L)/2 ± mult×ATR、終値で追従・反転判定
+  function SUPERTREND(data, period, mult) {
+    var h = highs(data), l = lows(data), c = closes(data), n = data.length;
+    var atr = ATR(data, period, "wilder");
+    var upper = new Array(n).fill(null), lower = new Array(n).fill(null);
+    var line = new Array(n).fill(null), dir = new Array(n).fill(null);
+    var fub = null, flb = null, sd = 1;
+    for (var i = period; i < n; i++) {
+      if (atr[i] === null) continue;
+      var mid = (h[i] + l[i]) / 2;
+      var bub = mid + mult * atr[i], blb = mid - mult * atr[i];
+      fub = (fub !== null && bub < fub || c[i - 1] > fub) ? bub : (fub === null ? bub : fub);
+      flb = (flb !== null && blb > flb || c[i - 1] < flb) ? blb : (flb === null ? blb : flb);
+      if (c[i] > fub) sd = 1; else if (c[i] < flb) sd = -1;
+      upper[i] = fub; lower[i] = flb; dir[i] = sd;
+      line[i] = sd === 1 ? flb : fub;
+    }
+    return { upper: upper, lower: lower, line: line, dir: dir };
+  }
+
+  // OBV: sign(終値の前日差)×出来高 の累積
+  function OBV(data) {
+    var c = closes(data), v = vols(data), n = data.length;
+    var out = new Array(n).fill(null);
+    var acc = 0;
+    for (var i = 0; i < n; i++) {
+      if (i === 0) { out[i] = 0; continue; }
+      if (c[i] > c[i - 1]) acc += v[i];
+      else if (c[i] < c[i - 1]) acc -= v[i];
+      out[i] = acc;
+    }
+    return out;
+  }
+
+  // 2系列のクロス点(GC=上抜け/DC=下抜け)を {golden: [...], dead: [...]} で返す
+  function CROSS_POINTS(a, b) {
+    var golden = [], dead = [];
+    for (var i = 1; i < a.length; i++) {
+      if (a[i] === null || b[i] === null || a[i - 1] === null || b[i - 1] === null) continue;
+      if (a[i - 1] <= b[i - 1] && a[i] > b[i]) golden.push(i);
+      else if (a[i - 1] >= b[i - 1] && a[i] < b[i]) dead.push(i);
+    }
+    return { golden: golden, dead: dead };
+  }
+
   global.Indicators = {
     closes: closes, highs: highs, lows: lows, vols: vols,
     SMA: SMA, EMA: EMA, RSI: RSI, CCI: CCI, MACD: MACD,
-    ADX: ADX, BOLL: BOLL, ATR: ATR, TR: TR, VWMA: VWMA
+    ADX: ADX, BOLL: BOLL, ATR: ATR, TR: TR, VWMA: VWMA,
+    STOCH: STOCH, KDJ: KDJ, SUPERTREND: SUPERTREND, OBV: OBV, CROSS_POINTS: CROSS_POINTS
   };
 })(window);
