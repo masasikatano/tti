@@ -142,7 +142,7 @@
     },
 
     vwma: {
-      tag: "出来高系",
+      tag: "トレンド系",
       title: "VWMA(出来高加重移動平均)",
       smaNote: "SMA(Simple Moving Average、単純移動平均)は「過去n日の終値を足してnで割った平均」です。計算は単純ですが、移動平均の基本形であり、EMA や VWMA など他の移動平均系指標の基礎になります。n日ごとに古い値が平均から外れるため、急な価格変動への反応は階段的になります。VWMA では、このSMAと同じ期間のものを比較用に重ね、出来高の偏りによる乖離を見ます。",
       full: "VWMA = Volume Weighted Moving Average(出来高加重移動平均)。特定の提唱者は定まっておらず、加重移動平均の一般的な応用として使われる。SMA(Simple Moving Average、単純移動平均)は比較用に併記",

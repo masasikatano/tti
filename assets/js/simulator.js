@@ -155,9 +155,8 @@
   };
   var GROUPS = [
     { label: "オシレーター系(過熱・逆行の目安)", keys: ["rsi", "cci"] },
-    { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx"] },
-    { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr"] },
-    { label: "出来高系", keys: ["vwma"] }
+    { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx", "vwma"] },
+    { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr"] }
   ];
 
   // ---- debounce(約200ms) ----
