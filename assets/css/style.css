@@ -98,7 +98,19 @@ select, button {
 button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
 button:hover { filter: brightness(0.96); }
 
-.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0; }
+.tabs { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px; margin: 16px 0; }
+.tabs .group { display: flex; flex-direction: column; gap: 6px; }
+.tabs .group-label {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  padding: 3px 12px;
+  white-space: nowrap;
+}
+.tabs .group-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
 .tabs button {
   border: 1px solid var(--line); background: var(--card); color: var(--sub);
   border-radius: 999px; padding: 6px 16px;

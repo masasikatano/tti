@@ -153,7 +153,12 @@
       }
     }
   };
-  var ORDER = ["rsi", "cci", "macd", "adx", "boll", "atr", "vwma"];
+  var GROUPS = [
+    { label: "オシレーター系(過熱・逆行の目安)", keys: ["rsi", "cci"] },
+    { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx"] },
+    { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr"] },
+    { label: "出来高系", keys: ["vwma"] }
+  ];
 
   // ---- debounce(約200ms) ----
   function debounce(fn, ms) {
@@ -239,13 +244,25 @@
   function buildTabs() {
     var box = document.getElementById("tabs");
     box.innerHTML = "";
-    ORDER.forEach(function (key) {
-      var btn = document.createElement("button");
-      btn.textContent = DEFS[key].label;
-      btn.dataset.key = key;
-      btn.className = key === state.indicator ? "active" : "";
-      btn.addEventListener("click", function () { selectIndicator(key); });
-      box.appendChild(btn);
+    GROUPS.forEach(function (g) {
+      var group = document.createElement("div");
+      group.className = "group";
+      var head = document.createElement("div");
+      head.className = "group-label";
+      head.textContent = g.label;
+      group.appendChild(head);
+      var row = document.createElement("div");
+      row.className = "group-buttons";
+      g.keys.forEach(function (key) {
+        var btn = document.createElement("button");
+        btn.textContent = DEFS[key].label;
+        btn.dataset.key = key;
+        btn.className = key === state.indicator ? "active" : "";
+        btn.addEventListener("click", function () { selectIndicator(key); });
+        row.appendChild(btn);
+      });
+      group.appendChild(row);
+      box.appendChild(group);
     });
   }
 
