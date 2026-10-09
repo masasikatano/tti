@@ -23,7 +23,7 @@
   var DEFS = {
     rsi: {
       label: "RSI",
-      params: [{ key: "period", label: "期間", min: 5, max: 50, step: 1, def: 14 }],
+      params: [{ key: "period", label: "期間", min: 5, max: 50, step: 1, def: 14, hint: "目安: 14日(Wilder のオリジナル)。短期化(5〜9)すれば反応は速くなるがノイズが増え、長期化(21〜25)すれば滑らかになるが遅れる。" }],
       priceMode: "separate",
       fixedY: [0, 100],
       build: function (d, p) {
@@ -40,7 +40,7 @@
     },
     cci: {
       label: "CCI",
-      params: [{ key: "period", label: "期間", min: 5, max: 50, step: 1, def: 20 }],
+      params: [{ key: "period", label: "期間", min: 5, max: 50, step: 1, def: 20, hint: "目安: 20日(Lambert のオリジナルは月次チャート向けに考案されたため、日次では14〜20日が一般的)。±100のラインはこの期間想定の定数0.015に基づく。" }],
       priceMode: "separate",
       build: function (d, p) {
         var r = Indicators.CCI(d, p.period);
@@ -58,9 +58,9 @@
     macd: {
       label: "MACD",
       params: [
-        { key: "fast", label: "短期EMA", min: 3, max: 20, step: 1, def: 12 },
-        { key: "slow", label: "長期EMA", min: 10, max: 60, step: 1, def: 26 },
-        { key: "signal", label: "シグナル", min: 3, max: 20, step: 1, def: 9 }
+        { key: "fast", label: "短期EMA", min: 3, max: 20, step: 1, def: 12, hint: "目安: 12日(Appel の標準)。短期化するとクロスが早くなるがダマシ増加。" },
+        { key: "slow", label: "長期EMA", min: 10, max: 60, step: 1, def: 26, hint: "目安: 26日(Appel の標準)。短期との差(グリッド)が大きいほど緩やかな長期トレンド向き。" },
+        { key: "signal", label: "シグナル", min: 3, max: 20, step: 1, def: 9, hint: "目安: 9日(Appel の標準)。短くするとシグナルが早いがノイズが増える。" }
       ],
       priceMode: "separate",
       build: function (d, p) {
@@ -80,7 +80,7 @@
     },
     adx: {
       label: "ADX",
-      params: [{ key: "period", label: "期間(Wilder固定)", min: 5, max: 30, step: 1, def: 14 }],
+      params: [{ key: "period", label: "期間(Wilder固定)", min: 5, max: 30, step: 1, def: 14, hint: "目安: 14日(Wilder のオリジナル)。ADXは20〜25超でトレンド相場と判断するのが定石(期間を変えてもこの目安は使われる)。" }],
       priceMode: "separate",
       fixedY: [0, 100],
       build: function (d, p) {
@@ -99,8 +99,8 @@
     boll: {
       label: "BOLL",
       params: [
-        { key: "period", label: "期間", min: 5, max: 50, step: 1, def: 20 },
-        { key: "sigma", label: "σ倍率", min: 0.5, max: 4, step: 0.1, def: 2.0 }
+        { key: "period", label: "期間", min: 5, max: 50, step: 1, def: 20, hint: "目安: 20日(Bollinger の標準)。統計的な意味が保たれるのは20日以上が望ましいとされる。" },
+        { key: "sigma", label: "σ倍率", min: 0.5, max: 4, step: 0.1, def: 2.0, hint: "目安: 2.0σ(Bollinger の標準。正規分布なら約95%がバンド内)。短期トレード向けには1.5σ〜、長期・大きな変動を捉えたい場合は2.5σ〜3σ。" }
       ],
       priceMode: "overlay",
       build: function (d, p) {
@@ -120,8 +120,8 @@
     atr: {
       label: "ATR",
       params: [
-        { key: "period", label: "期間", min: 5, max: 30, step: 1, def: 14 },
-        { key: "method", label: "平滑化", type: "select", options: [["sma", "SMA"], ["wilder", "Wilder"]], def: "wilder" }
+        { key: "period", label: "期間", min: 5, max: 30, step: 1, def: 14, hint: "目安: 14日(Wilder のオリジナル)。損切り幅=ATR×1.5〜3などのリスク管理に使う場合、この期間のATRが基準。" },
+        { key: "method", label: "平滑化", type: "select", options: [["sma", "SMA"], ["wilder", "Wilder"]], def: "wilder", hint: "目安: Wilder(オリジナル)。SMA は直近n日の単純平均で、Wilder より最新の値幅への反応が素直。" }
       ],
       priceMode: "separate",
       build: function (d, p) {
@@ -135,8 +135,8 @@
     vwma: {
       label: "VWMA",
       params: [
-        { key: "period", label: "VWMA期間", min: 5, max: 60, step: 1, def: 20 },
-        { key: "smaPeriod", label: "比較SMA期間", min: 5, max: 60, step: 1, def: 20 }
+        { key: "period", label: "VWMA期間", min: 5, max: 60, step: 1, def: 20, hint: "目安: 20日。SMAと同じ期間に揃えると乖離の比較が分かりやすい。" },
+        { key: "smaPeriod", label: "比較SMA期間", min: 5, max: 60, step: 1, def: 20, hint: "目安: VWMAと同じ20日。異なる期間にすると「期間差」と「出来高偏重」の効果が混ざるため注意。" }
       ],
       priceMode: "overlay",
       build: function (d, p) {
@@ -268,7 +268,17 @@
     var html = "";
     html += '<p><span class="tag">' + c.tag + '</span></p>';
     html += '<p class="lead">' + c.lead + '</p>';
+    html += '<p style="font-size:12px;opacity:.75;margin-top:-8px">' + c.full + '</p>';
+    if (c.portrait) {
+      html += '<img class="portrait" src="' + c.portrait + '" alt="' + c.title + ' 提唱者の写真">';
+    }
     html += '<h2>計算式</h2><div class="formula">' + escapeHtml(c.formula) + '</div>';
+    if (c.smaNote) {
+      html += '<h2>SMA(単純移動平均)の解説</h2><p>' + c.smaNote + '</p>';
+    }
+    if (c.emaNote) {
+      html += '<h2>EMA(指数移動平均)の解説</h2><p>' + c.emaNote + '</p>';
+    }
     html += '<p>' + c.explain + '</p>';
     html += '<h2>' + c.cmp.caption + '</h2><div class="table-scroll"><table class="cmp">';
     html += "<tr>" + c.cmp.headers.map(function (h) { return "<th>" + h + "</th>"; }).join("") + "</tr>";
@@ -342,6 +352,12 @@
         });
       }
       div.appendChild(input);
+      if (pd.hint) {
+        var hint = document.createElement("div");
+        hint.className = "hint";
+        hint.textContent = pd.hint;
+        div.appendChild(hint);
+      }
       box.appendChild(div);
     });
   }
