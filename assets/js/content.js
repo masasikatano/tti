@@ -77,10 +77,10 @@
     adx: {
       tag: "トレンド系",
       title: "ADX(平均方向性指数)",
-      full: "ADX = Average Directional Index(平均方向性指数)。提唱者: J. Welles Wilder, Jr.(1978年)。DI = Directional Indicator、DM = Directional Movement、DX = Directional Index(いずれも同書で定義)",
+      full: "ADX = Average Directional Index(平均方向性指数)。提唱者: J. Welles Wilder, Jr.(1978年)。TR = True Range(真実範囲)、DI = Directional Indicator、DM = Directional Movement、DX = Directional Index(いずれも同書で定義)",
       portrait: "assets/img/wilder.webp",
       lead: "トレンドが「どれだけ強いか」を0〜100で示す指標。方向そのものは示しません。",
-      formula: "TR = max(高値−安値, |高値−前日終値|, |安値−前日終値|)\n+DM = 高値の上昇幅(高値が前日より下がった日は0)\n−DM = 安値の下落幅(安値が前日より上がった日は0)\n+DI = 100 × (+DMのWilder平均) ÷ (TRのWilder平均)\n−DI = 100 × (−DMのWilder平均) ÷ (TRのWilder平均)\nDX = 100 × |+DI − −DI| ÷ (+DI + −DI)\nADX = DX の Wilder 平滑化\n\n※平滑化方式は Wilder 固定。デフォルト期間は14。",
+      formula: "TR(真実範囲) = max(高値−安値, |高値−前日終値|, |安値−前日終値|)\n+DM = 高値の上昇幅(高値が前日より下がった日は0)\n−DM = 安値の下落幅(安値が前日より上がった日は0)\n+DI = 100 × (+DMのWilder平均) ÷ (TRのWilder平均)\n−DI = 100 × (−DMのWilder平均) ÷ (TRのWilder平均)\nDX = 100 × |+DI − −DI| ÷ (+DI + −DI)\nADX = DX の Wilder 平滑化\n\n※平滑化方式は Wilder 固定。デフォルト期間は14。",
       explain: "平易に言うと:「値幅(TR)の中で、一方方向への動き(±DM)がどれだけ支配的か」を連鎖的に平均化したものです。日々の値幅がまちまちでも、一方向に動く日が続くほどADXは上がります。",
       cmp: {
         caption: "MACD vs ADX",

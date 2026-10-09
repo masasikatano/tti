@@ -12,6 +12,7 @@
     return {
       responsive: true,
       maintainAspectRatio: false,
+      animation: false,
       interaction: { mode: "index", intersect: false },
       plugins: {
         legend: { position: "top", labels: { boxWidth: 14, font: { size: 11 } } },
