@@ -400,11 +400,11 @@
       html += '<img class="portrait" src="' + c.portrait + '" alt="' + c.title + ' 提唱者の写真">';
     }
     html += '<h2>計算式</h2><div class="formula">' + escapeHtml(c.formula) + '</div>';
-    if (c.smaNote) {
-      html += '<h2>SMA(単純移動平均)の解説</h2><p>' + c.smaNote + '</p>';
-    }
-    if (c.emaNote) {
-      html += '<h2>EMA(指数移動平均)の解説</h2><p>' + c.emaNote + '</p>';
+    if (c.terms && c.terms.length) {
+      html += '<h2>用語解説</h2>';
+      c.terms.forEach(function (t) {
+        html += '<p><b>' + t.t + '</b> — ' + t.d + '</p>';
+      });
     }
     html += '<p>' + c.explain + '</p>';
     html += '<h2>' + c.cmp.caption + '</h2><div class="table-scroll"><table class="cmp">';
