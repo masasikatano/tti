@@ -270,6 +270,20 @@
     return out;
   }
 
+  // Chaikin A/D: 収支比率CLV=((C−L)−(H−C))/(H−L)に出来高を掛けて累積
+  function CHAIKIN_AD(data) {
+    var h = highs(data), l = lows(data), c = closes(data), v = vols(data), n = data.length;
+    var out = new Array(n).fill(null);
+    var acc = 0;
+    for (var i = 0; i < n; i++) {
+      var range = h[i] - l[i];
+      var clv = range === 0 ? 0 : ((c[i] - l[i]) - (h[i] - c[i])) / range;
+      acc += clv * v[i];
+      out[i] = acc;
+    }
+    return out;
+  }
+
   // 2系列のクロス点(GC=上抜け/DC=下抜け)を {golden: [...], dead: [...]} で返す
   function CROSS_POINTS(a, b) {
     var golden = [], dead = [];
@@ -285,6 +299,6 @@
     closes: closes, highs: highs, lows: lows, vols: vols,
     SMA: SMA, EMA: EMA, RSI: RSI, CCI: CCI, MACD: MACD,
     ADX: ADX, BOLL: BOLL, ATR: ATR, TR: TR, VWMA: VWMA,
-    STOCH: STOCH, KDJ: KDJ, SUPERTREND: SUPERTREND, OBV: OBV, CROSS_POINTS: CROSS_POINTS
+    STOCH: STOCH, KDJ: KDJ, SUPERTREND: SUPERTREND, OBV: OBV, CHAIKIN_AD: CHAIKIN_AD, CROSS_POINTS: CROSS_POINTS
   };
 })(window);

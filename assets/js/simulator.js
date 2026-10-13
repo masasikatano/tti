@@ -262,11 +262,29 @@
           indTitle: "OBV(出来高フローの累積。※出来高は疑似生成のため参考値)"
         };
       }
+    },
+    chad: {
+      label: "Chaikin A/D",
+      params: [
+        { key: "emaPeriod", label: "EMA期間(傾き確認用)", min: 3, max: 60, step: 1, def: 20, hint: "目安: 20日。Chaikin A/D自体は累積値のため水準ではなく傾きを見る。EMAとの位置関係で資金フローの勢いの転換を確認する使い方。" }
+      ],
+      priceMode: "separate",
+      build: function (d, p) {
+        var r = Indicators.CHAIKIN_AD(d);
+        var ema = Indicators.EMA(r, p.emaPeriod);
+        return {
+          ind: [
+            Charts.line("Chaikin A/D", r, "#2563eb", { width: 1.8 }),
+            Charts.line("A/DのEMA(" + p.emaPeriod + ")", ema, "#dc2626", { width: 1.4 })
+          ],
+          indTitle: "Chaikin A/D(寄り引け収支×出来高の累積。※出来高は疑似生成のため参考値)"
+        };
+      }
     }
   };
   var GROUPS = [
     { label: "オシレーター系(過熱・逆行の目安)", keys: ["rsi", "cci", "stoch", "kdj"] },
-    { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx", "vwma", "cross", "supertrend", "obv"] },
+    { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx", "vwma", "cross", "supertrend", "obv", "chad"] },
     { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr"] }
   ];
 
@@ -295,7 +313,7 @@
         state.data = r.data;
         state.meta = r.meta;
         notice.innerHTML = "実データモード:「" + r.meta.name + "」(出典: " + r.meta.source +
-          ")の日次終値を使用中。<b>High/Low/出来高は終値から疑似生成しているため</b>、ATR/CCI/ADX/BOLL/VWMA/ストキャスティクス/KDJ/スーパートレンド/OBVなどの水準は参考値です。";
+          ")の日次終値を使用中。<b>High/Low/出来高は終値から疑似生成しているため</b>、ATR/CCI/ADX/BOLL/VWMA/ストキャスティクス/KDJ/スーパートレンド/OBV/Chaikin A/Dなどの水準は参考値です。";
         notice.style.display = "block";
         render();
       }).catch(function (e) {
