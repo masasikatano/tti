@@ -217,6 +217,18 @@
     return { k: k, d: d };
   }
 
+  // Williams %R: (HHV−C)/(HHV−LLV)×−100。範囲は−100〜0で、RSV−100と一致
+  function WILLIAMS_R(data, period) {
+    var h = highs(data), l = lows(data), c = closes(data), n = data.length;
+    var out = new Array(n).fill(null);
+    for (var i = period - 1; i < n; i++) {
+      var hh = -Infinity, ll = Infinity;
+      for (var j = i - period + 1; j <= i; j++) { if (h[j] > hh) hh = h[j]; if (l[j] < ll) ll = l[j]; }
+      out[i] = hh === ll ? -50 : (hh - c[i]) / (hh - ll) * -100;
+    }
+    return out;
+  }
+
   // KDJ: RSVをα=1/3の指数平滑で%K、%D、J=3%K−2%D(中国発のストキャスティクス発展形)
   function KDJ(data, period) {
     var h = highs(data), l = lows(data), c = closes(data), n = data.length;
@@ -299,6 +311,6 @@
     closes: closes, highs: highs, lows: lows, vols: vols,
     SMA: SMA, EMA: EMA, RSI: RSI, CCI: CCI, MACD: MACD,
     ADX: ADX, BOLL: BOLL, ATR: ATR, TR: TR, VWMA: VWMA,
-    STOCH: STOCH, KDJ: KDJ, SUPERTREND: SUPERTREND, OBV: OBV, CHAIKIN_AD: CHAIKIN_AD, CROSS_POINTS: CROSS_POINTS
+    STOCH: STOCH, KDJ: KDJ, WILLIAMS_R: WILLIAMS_R, SUPERTREND: SUPERTREND, OBV: OBV, CHAIKIN_AD: CHAIKIN_AD, CROSS_POINTS: CROSS_POINTS
   };
 })(window);

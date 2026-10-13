@@ -174,6 +174,25 @@
         };
       }
     },
+    wpr: {
+      label: "Williams %R",
+      params: [
+        { key: "period", label: "期間", min: 3, max: 50, step: 1, def: 14, hint: "目安: 14日(Williams の標準)。短期化すると反応は速いが、−20/−80ラインとの絡みでノイズが増える。" }
+      ],
+      priceMode: "separate",
+      fixedY: [-100, 0],
+      build: function (d, p) {
+        var r = Indicators.WILLIAMS_R(d, p.period);
+        return {
+          ind: [
+            Charts.line("%R(" + p.period + ")", r, "#2563eb", { width: 2 }),
+            Charts.line("上限 -20", r.map(function () { return -20; }), "#dc2626", { dash: [6, 4], width: 1 }),
+            Charts.line("下限 -80", r.map(function () { return -80; }), "#16a34a", { dash: [6, 4], width: 1 })
+          ],
+          indTitle: "%R(−100〜0)"
+        };
+      }
+    },
     kdj: {
       label: "KDJ",
       params: [
@@ -283,7 +302,7 @@
     }
   };
   var GROUPS = [
-    { label: "オシレーター系(過熱・逆行の目安)", keys: ["rsi", "cci", "stoch", "kdj"] },
+    { label: "オシレーター系(過熱・逆行の目安)", keys: ["rsi", "cci", "stoch", "wpr", "kdj"] },
     { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx", "vwma", "cross", "supertrend", "obv", "chad"] },
     { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr"] }
   ];
