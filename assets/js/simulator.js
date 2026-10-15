@@ -299,12 +299,21 @@
           indTitle: "Chaikin A/D(寄り引け収支×出来高の累積。※出来高は疑似生成のため参考値)"
         };
       }
+    },
+    vprofile: {
+      label: "ボリュームプロファイル",
+      params: [
+        { key: "bins", label: "価格帯の分割数", min: 10, max: 60, step: 1, def: 25, hint: "目安: 25分割。粗く(10〜15)すると大きな価格帯の構造が見え、細かく(40〜60)すると微細な滞留帯が見えるがノイズが増える。" }
+      ],
+      priceMode: "profile",
+      build: null // 下ペインの折れ線チャートではなく、横棒のプロファイルペインで描画する(render で個別処理)
     }
   };
   var GROUPS = [
     { label: "オシレーター系(過熱・逆行の目安)", keys: ["rsi", "cci", "stoch", "wpr", "kdj"] },
     { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx", "vwma", "cross", "supertrend", "obv", "chad"] },
-    { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr"] }
+    { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr"] },
+    { label: "市場の構造(価格分布)", keys: ["vprofile"] }
   ];
 
   // ---- debounce(約200ms) ----
@@ -364,20 +373,40 @@
     var priceDs = [];
     var indDs = [];
     var priceTitle, indTitle = def.label;
+    var profileBox = document.getElementById("profile-box");
+    var indicatorBox = document.getElementById("indicator-box");
+    var profileSpec = null;
 
-    if (def.priceMode === "overlay") {
-      var built = def.build(d, p);
-      priceDs = [Charts.line("終値", closes, "#2563eb", { width: 1.6 })].concat(built.price);
-      priceTitle = "終値(" + unit + ")と指標";
-      indDs = built.ind; indTitle = built.indTitle;
-    } else {
+    if (def.priceMode === "profile") {
+      // プロファイル: 上ペインは終値のみ、下ペインを隠して3つ目のペインに分布を描画
+      profileBox.style.display = "";
+      indicatorBox.style.display = "none";
       priceDs = [Charts.line("終値(" + unit + ")", closes, "#2563eb", { width: 1.6 })];
       priceTitle = "終値";
-      var sep = def.build(d, p);
-      indDs = sep.ind; indTitle = sep.indTitle;
+      var agg = MarketProfile.aggregate(d, p.bins);
+      if (agg) {
+        profileSpec = {
+          agg: agg,
+          title: "出来高(表示範囲の日次集計。※疑似生成のため参考値)"
+        };
+      }
+    } else {
+      profileBox.style.display = "none";
+      indicatorBox.style.display = "";
+      if (def.priceMode === "overlay") {
+        var built = def.build(d, p);
+        priceDs = [Charts.line("終値", closes, "#2563eb", { width: 1.6 })].concat(built.price);
+        priceTitle = "終値(" + unit + ")と指標";
+        indDs = built.ind; indTitle = built.indTitle;
+      } else {
+        priceDs = [Charts.line("終値(" + unit + ")", closes, "#2563eb", { width: 1.6 })];
+        priceTitle = "終値";
+        var sep = def.build(d, p);
+        indDs = sep.ind; indTitle = sep.indTitle;
+      }
     }
 
-    var charts = Charts.create("priceChart", "indicatorChart", labels, priceDs, indDs, priceTitle, indTitle);
+    var charts = Charts.create("priceChart", "indicatorChart", labels, priceDs, indDs, priceTitle, indTitle, profileSpec);
     if (def.fixedY) {
       charts.indicator.options.scales.y.min = def.fixedY[0];
       charts.indicator.options.scales.y.max = def.fixedY[1];
