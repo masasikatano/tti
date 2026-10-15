@@ -268,6 +268,20 @@
     return { upper: upper, lower: lower, line: line, dir: dir };
   }
 
+  // ケルトナーチャネル: 中心=終値EMA、帯=中心 ± mult×ATR
+  function KELTNER(data, emaPeriod, atrPeriod, mult, method) {
+    var mid = EMA(closes(data), emaPeriod);
+    var atr = ATR(data, atrPeriod, method || "sma");
+    var n = data.length;
+    var upper = new Array(n).fill(null), lower = new Array(n).fill(null);
+    for (var i = 0; i < n; i++) {
+      if (mid[i] === null || atr[i] === null) continue;
+      upper[i] = mid[i] + mult * atr[i];
+      lower[i] = mid[i] - mult * atr[i];
+    }
+    return { mid: mid, upper: upper, lower: lower };
+  }
+
   // OBV: sign(終値の前日差)×出来高 の累積
   function OBV(data) {
     var c = closes(data), v = vols(data), n = data.length;
@@ -311,6 +325,6 @@
     closes: closes, highs: highs, lows: lows, vols: vols,
     SMA: SMA, EMA: EMA, RSI: RSI, CCI: CCI, MACD: MACD,
     ADX: ADX, BOLL: BOLL, ATR: ATR, TR: TR, VWMA: VWMA,
-    STOCH: STOCH, KDJ: KDJ, WILLIAMS_R: WILLIAMS_R, SUPERTREND: SUPERTREND, OBV: OBV, CHAIKIN_AD: CHAIKIN_AD, CROSS_POINTS: CROSS_POINTS
+    STOCH: STOCH, KDJ: KDJ, WILLIAMS_R: WILLIAMS_R, SUPERTREND: SUPERTREND, KELTNER: KELTNER, OBV: OBV, CHAIKIN_AD: CHAIKIN_AD, CROSS_POINTS: CROSS_POINTS
   };
 })(window);

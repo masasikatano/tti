@@ -117,6 +117,29 @@
         };
       }
     },
+    keltner: {
+      label: "ケルトナー",
+      params: [
+        { key: "emaPeriod", label: "EMA期間", min: 2, max: 100, step: 1, def: 20, hint: "目安: 20日。EMAは直近の値動きをSMAより速く反映するため、トレンドの追随性が高い。長期化するとチャネルが滑らかになるが遅れる。" },
+        { key: "atrPeriod", label: "ATR期間", min: 2, max: 50, step: 1, def: 10, hint: "目安: 10日。短くするとチャネル幅が最新の値幅に敏感になり、長くすると安定する。" },
+        { key: "mult", label: "ATR倍率", min: 0.5, max: 5, step: 0.1, def: 2.0, hint: "目安: 2.0。小さくするとチャネルが狭くなりブレイクが早く検出できるが、レンジ内で頻回に触れる。大きくすると広くなり大きな波のみ捉える。" },
+        { key: "method", label: "ATR平滑化", type: "select", options: [["sma", "SMA"], ["wilder", "Wilder"]], def: "sma", hint: "目安: SMA。Wilder は古い値幅の影響が残る指数平滑。SMA は直近n日の値幅の単純平均で、最新の変化への反応が素直。" }
+      ],
+      priceMode: "overlay",
+      build: function (d, p) {
+        var k = Indicators.KELTNER(d, p.emaPeriod, p.atrPeriod, p.mult, p.method);
+        var width = k.mid.map(function (m, i) { return m === null ? null : (k.upper[i] - k.lower[i]) / m * 100; });
+        return {
+          price: [
+            Charts.line("+" + p.mult + "×ATR", k.upper, "#f59e0b", { dash: [6, 4], width: 1.4 }),
+            Charts.line("中心線 EMA(" + p.emaPeriod + ")", k.mid, "#dc2626", { width: 1.4 }),
+            Charts.line("-" + p.mult + "×ATR", k.lower, "#f59e0b", { dash: [6, 4], width: 1.4 })
+          ],
+          ind: [Charts.line("チャネル幅(%)", width, "#7c3aed", { width: 1.8 })],
+          indTitle: "チャネル幅 (上−下)/中心 ×100 [%]"
+        };
+      }
+    },
     atr: {
       label: "ATR",
       params: [
@@ -312,7 +335,7 @@
   var GROUPS = [
     { label: "オシレーター系(過熱・逆行の目安)", keys: ["rsi", "cci", "stoch", "wpr", "kdj"] },
     { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx", "vwma", "cross", "supertrend", "obv", "chad"] },
-    { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr"] },
+    { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr", "keltner"] },
     { label: "市場の構造(価格分布)", keys: ["vprofile"] }
   ];
 
