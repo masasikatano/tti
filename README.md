@@ -1,12 +1,12 @@
 # テクニカル指標学習アプリ (tti)
 
-14のテクニカル指標(RSI・CCI・ストキャスティクス・Williams %R・KDJ・MACD・ADX・VWMA・ゴールデンクロス/デッドクロス・スーパートレンド・OBV・Chaikin A/D・BOLL・ATR)と、市場の構造(価格分布)を見るボリュームプロファイル(Market Profile)を「目的別に整理して理解する」ためのインタラクティブな学習用Webアプリ。
+15のテクニカル指標(RSI・CCI・ストキャスティクス・Williams %R・KDJ・MACD・ADX・VWMA・ゴールデンクロス/デッドクロス・スーパートレンド・OBV・Chaikin A/D・BOLL・ATR・TTM Squeeze)と、市場の構造(価格分布)を見るボリュームプロファイル(Market Profile)を「目的別に整理して理解する」ためのインタラクティブな学習用Webアプリ。
 
 ## ページ構成
 
 | ファイル | 内容 |
 |---|---|
-| `index.html` | 分類ダッシュボード(14指標をオシレーター系・トレンド系・ボラティリティ系の3カテゴリで表示) |
+| `index.html` | 分類ダッシュボード(15指標をオシレーター系・トレンド系・ボラティリティ系の3カテゴリで表示) |
 | `simulator.html` | シミュレーター。タブで指標を切替、`?indicator=rsi` のように直接指定も可。各指標の解説(計算式・比較表・よくある誤解)は折りたたみパネルに表示 |
 
 ダッシュボードの各カードから `simulator.html?indicator=<key>` へ直接遷移する。
@@ -46,7 +46,7 @@ npx serve .
 - Chart.js はCDNから読み込み
 - `assets/css/style.css` — ハンドメイドCSS
 - `assets/js/`
-  - `indicators.js` — SMA/EMA と14指標の計算
+  - `indicators.js` — SMA/EMA と15指標の計算
   - `charts.js` — 2ペイン連動チャート(ボリュームプロファイル用の横棒ペイン生成も担当)
   - `data.js` — 疑似ランダムウォーク生成・実データ読み込み
   - `content.js` — 各指標の解説コンテンツ(計算式・比較表・誤解)

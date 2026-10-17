@@ -155,6 +155,40 @@
         };
       }
     },
+    ttm: {
+      label: "TTM Squeeze",
+      params: [
+        { key: "bbPeriod", label: "BOLL期間", min: 5, max: 50, step: 1, def: 20, hint: "目安: 20日。ボリンジャーバンドとケルトナーの中心線(EMA)の両方に使う。統計的な意味が保たれるのは20日以上が望ましいとされる。" },
+        { key: "bbSigma", label: "σ倍率", min: 0.5, max: 4, step: 0.1, def: 2.0, hint: "目安: 2.0σ。ケルトナー倍率1.5×ATRと比べてBB側を広げるとドットが出にくくなり、狭めると出やすくなる。" },
+        { key: "atrPeriod", label: "ATR期間", min: 2, max: 50, step: 1, def: 10, hint: "目安: 10日。ケルトナーチャネル幅のATR期間。短くするとチャネル幅が最新の値幅に敏感になる。" },
+        { key: "atrMult", label: "ATR倍率", min: 0.5, max: 5, step: 0.1, def: 1.5, hint: "目安: 1.5。Carter の標準はBB 2.0σ / ケルトナー 1.5×ATR。小さくするとBBがチャネル内に入りやすく(ドットが増え)、大きくすると出にくくなる。" }
+      ],
+      priceMode: "overlay",
+      build: function (d, p) {
+        var r = Indicators.TTM(d, p.bbPeriod, p.bbSigma, p.atrPeriod, p.atrMult);
+        var sqOn = r.squeeze.map(function (s, i) { return s === 1 ? r.kc.lower[i] : null; });
+        var sqOff = r.squeeze.map(function (s, i) { return s === 0 ? r.kc.lower[i] : null; });
+        var momUp = r.momentum.map(function (m) { return m !== null && m >= 0 ? m : null; });
+        var momDn = r.momentum.map(function (m) { return m !== null && m < 0 ? m : null; });
+        return {
+          price: [
+            Charts.line("BB +" + p.bbSigma + "σ", r.bb.upper, "#f59e0b", { dash: [6, 4], width: 1.2 }),
+            Charts.line("BB −" + p.bbSigma + "σ", r.bb.lower, "#f59e0b", { dash: [6, 4], width: 1.2 }),
+            Charts.line("KC 中心 EMA(" + p.bbPeriod + ")", r.kc.mid, "#dc2626", { width: 1.2 }),
+            Charts.line("KC ±" + p.atrMult + "×ATR", r.kc.upper, "#64748b", { dash: [2, 4], width: 1 }),
+            Charts.line("KC −" + p.atrMult + "×ATR", r.kc.lower, "#64748b", { dash: [2, 4], width: 1 }),
+            Charts.points("Squeeze(収縮中)", sqOn, "#dc2626", { style: "circle", radius: 4 }),
+            Charts.points("Release(解除)", sqOff, "#16a34a", { style: "circle", radius: 4 })
+          ],
+          ind: [
+            Charts.bar("モメンタム ≥0", momUp, "#16a34a"),
+            Charts.bar("モメンタム <0", momDn, "#dc2626"),
+            Charts.line("0", r.momentum.map(function () { return 0; }), "#94a3b8", { dash: [2, 4], width: 1 })
+          ],
+          indTitle: "モメンタム(終値 − 典型価の" + p.bbPeriod + "日SMA)"
+        };
+      }
+    },
     vwma: {
       label: "VWMA",
       params: [
@@ -335,7 +369,7 @@
   var GROUPS = [
     { label: "オシレーター系(過熱・逆行の目安)", keys: ["rsi", "cci", "stoch", "wpr", "kdj"] },
     { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx", "vwma", "cross", "supertrend", "obv", "chad"] },
-    { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr", "keltner"] },
+    { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr", "keltner", "ttm"] },
     { label: "市場の構造(価格分布)", keys: ["vprofile"] }
   ];
 

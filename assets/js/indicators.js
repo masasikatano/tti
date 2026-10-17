@@ -1,4 +1,4 @@
-/* indicators.js — SMA/EMA と 7指標の実装
+/* indicators.js — SMA/EMA と各テクニカル指標の実装
  * すべて入力は [{date, open, high, low, close, volume}]。
  * ウォームアップ期間は null で埋め、描画時にスキップする(安全側)。
  */
@@ -310,6 +310,25 @@
     return out;
   }
 
+  // TTM Squeeze: ボリンジャーバンドがケルトナーチャネル内に収まる状態をドットで示し、
+  // モメンタム(終値 − 典型価のn日SMA、一般的な公開実装の式)でブレイク方向を補助する。
+  function TTM(data, bbPeriod, bbSigma, atrPeriod, atrMult) {
+    var n = data.length;
+    var bb = BOLL(data, bbPeriod, bbSigma);
+    var kc = KELTNER(data, bbPeriod, atrPeriod, atrMult, "sma");
+    var tp = new Array(n);
+    for (var i = 0; i < n; i++) tp[i] = (data[i].high + data[i].low + data[i].close) / 3;
+    var tpSMA = SMA(tp, bbPeriod);
+    var momentum = new Array(n).fill(null), squeeze = new Array(n).fill(null);
+    for (i = 0; i < n; i++) {
+      if (tpSMA[i] !== null) momentum[i] = data[i].close - tpSMA[i];
+      if (bb.upper[i] !== null && kc.upper[i] !== null) {
+        squeeze[i] = (bb.upper[i] <= kc.upper[i] && bb.lower[i] >= kc.lower[i]) ? 1 : 0;
+      }
+    }
+    return { bb: bb, kc: kc, squeeze: squeeze, momentum: momentum };
+  }
+
   // 2系列のクロス点(GC=上抜け/DC=下抜け)を {golden: [...], dead: [...]} で返す
   function CROSS_POINTS(a, b) {
     var golden = [], dead = [];
@@ -325,6 +344,6 @@
     closes: closes, highs: highs, lows: lows, vols: vols,
     SMA: SMA, EMA: EMA, RSI: RSI, CCI: CCI, MACD: MACD,
     ADX: ADX, BOLL: BOLL, ATR: ATR, TR: TR, VWMA: VWMA,
-    STOCH: STOCH, KDJ: KDJ, WILLIAMS_R: WILLIAMS_R, SUPERTREND: SUPERTREND, KELTNER: KELTNER, OBV: OBV, CHAIKIN_AD: CHAIKIN_AD, CROSS_POINTS: CROSS_POINTS
+    STOCH: STOCH, KDJ: KDJ, WILLIAMS_R: WILLIAMS_R, SUPERTREND: SUPERTREND, KELTNER: KELTNER, OBV: OBV, CHAIKIN_AD: CHAIKIN_AD, TTM: TTM, CROSS_POINTS: CROSS_POINTS
   };
 })(window);
