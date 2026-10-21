@@ -364,12 +364,45 @@
       ],
       priceMode: "profile",
       build: null // 下ペインの折れ線チャートではなく、横棒のプロファイルペインで描画する(render で個別処理)
+    },
+    vpa: {
+      label: "VPA",
+      params: [
+        { key: "period", label: "平均期間", min: 5, max: 60, step: 1, def: 20, hint: "目安: 20日。出来高と値幅の「いつもの水準(平均)」を取る期間。長くすると基準が安定し、短くするとシグナルが増える。" },
+        { key: "volMult", label: "出来高倍率", min: 1.0, max: 3.0, step: 0.1, def: 1.5, hint: "目安: 1.5倍。当日の出来高がこの期間平均の何倍以上で「高出来高」とみなすか。小さくするとシグナルが増え、大きくすると出来高が明確に膨らんだ日だけが拾われる。" },
+        { key: "bodyRatio", label: "実体の小ささ基準", min: 0.1, max: 0.6, step: 0.05, def: 0.3, hint: "目安: 0.3。実体(寄り引け差の絶対値)が値幅(高値−安値)に対してこの割合以下のバーを「狭い実体(圧力で動きが詰まったバー)」とみなす。" }
+      ],
+      priceMode: "overlay",
+      build: function (d, p) {
+        var r = Indicators.VPA(d, p.period, p.volMult, p.bodyRatio);
+        var v = Indicators.vols(d);
+        var volColor = v.map(function (vol, i) {
+          if (r.buy[i] !== null) return "rgba(22,163,74,0.75)";
+          if (r.sell[i] !== null) return "rgba(220,38,38,0.75)";
+          return "rgba(148,163,184,0.45)";
+        });
+        var volBar = Charts.bar("出来高(疑似)", v, "#94a3b8");
+        volBar.backgroundColor = volColor;
+        return {
+          price: [
+            Charts.points("VPA買いシグナル(▼)", r.buy, "#16a34a", { radius: 7, style: "triangle" }),
+            Charts.points("VPA売りシグナル(▲)", r.sell, "#dc2626", { radius: 7, style: "rectRot" })
+          ],
+          ind: [
+            volBar,
+            Charts.line("出来高倍率(当日÷平均)", r.volRatio, "#7c3aed", { width: 1.6 }),
+            Charts.line("基準 1.0×", r.volRatio.map(function () { return 1; }), "#94a3b8", { dash: [6, 4], width: 1 })
+          ],
+          indTitle: "出来高(緑/赤=シグナル日)と出来高倍率(※出来高は疑似生成のため参考値)"
+        };
+      }
     }
   };
   var GROUPS = [
     { label: "オシレーター系(過熱・逆行の目安)", keys: ["rsi", "cci", "stoch", "wpr", "kdj"] },
     { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx", "vwma", "cross", "supertrend", "obv", "chad"] },
     { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr", "keltner", "ttm"] },
+    { label: "出来高・需給(誰が主導しているか)", keys: ["vpa"] },
     { label: "市場の構造(価格分布)", keys: ["vprofile"] }
   ];
 
@@ -398,7 +431,7 @@
         state.data = r.data;
         state.meta = r.meta;
         notice.innerHTML = "実データモード:「" + r.meta.name + "」(出典: " + r.meta.source +
-          ")の日次終値を使用中。<b>High/Low/出来高は終値から疑似生成しているため</b>、ATR/CCI/ADX/BOLL/VWMA/ストキャスティクス/KDJ/スーパートレンド/OBV/Chaikin A/Dなどの水準は参考値です。";
+          ")の日次終値を使用中。<b>High/Low/出来高は終値から疑似生成しているため</b>、ATR/CCI/ADX/BOLL/VWMA/ストキャスティクス/KDJ/スーパートレンド/OBV/Chaikin A/D/VPAなどの水準は参考値です。";
         notice.style.display = "block";
         render();
       }).catch(function (e) {

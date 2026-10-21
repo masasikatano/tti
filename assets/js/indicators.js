@@ -329,6 +329,40 @@
     return { bb: bb, kc: kc, squeeze: squeeze, momentum: momentum };
   }
 
+  // VPA(Volume Price Analysis): スプレッド(値幅)と出来高の組み合わせでバー単位の需給を判定。
+  // 買いシグナル: (a)下落傾向中の「狭い実体+高出来高」=売り圧の吸収 (b)高出来高の陽線=蓄積の確認
+  // 売りシグナル: (a)上昇傾向中の「狭い実体+高出来高」=上げ疲れ/配分 (b)高出来高の陰線=供給の出現
+  // マーカーは買い=当日安値、売り=当日高値に打つ(価格ペイン上で見やすい位置)。
+  function VPA(data, period, volMult, bodyRatio) {
+    var c = closes(data), n = data.length;
+    var v = vols(data);
+    var spreads = data.map(function (d) { return d.high - d.low; });
+    var volAvg = SMA(v, period), spreadAvg = SMA(spreads, period), priceSMA = SMA(c, period);
+    var buy = new Array(n).fill(null), sell = new Array(n).fill(null);
+    var volRatio = new Array(n).fill(null);
+    for (var i = period; i < n; i++) {
+      if (volAvg[i] === null || spreadAvg[i] === null || priceSMA[i] === null) continue;
+      var d = data[i];
+      var spread = d.high - d.low;
+      var body = Math.abs(d.close - d.open);
+      if (volAvg[i] === 0 || spreadAvg[i] === 0) continue;
+      var vr = d.volume / volAvg[i];
+      volRatio[i] = vr;
+      if (vr < volMult) continue; // 「努力(出来高)」が平均を大きく上回る日だけ判定する
+      var narrowBody = spread > 0 && body / spread <= bodyRatio;
+      if (narrowBody) {
+        // 結果(値動き)に対して努力(出来高)が見合わない=どちらかの圧力が相殺されている
+        if (d.close < priceSMA[i]) buy[i] = d.low;   // 下落中に下がらない=買い圧で吸収
+        else if (d.close > priceSMA[i]) sell[i] = d.high; // 上昇中に上がらない=売り圧で抑止
+      } else {
+        // 出来高を伴ってしっかり動いたバー=その方向への「確認」
+        if (d.close > d.open && d.close > c[i - 1]) buy[i] = d.low;
+        else if (d.close < d.open && d.close < c[i - 1]) sell[i] = d.high;
+      }
+    }
+    return { buy: buy, sell: sell, volRatio: volRatio };
+  }
+
   // 2系列のクロス点(GC=上抜け/DC=下抜け)を {golden: [...], dead: [...]} で返す
   function CROSS_POINTS(a, b) {
     var golden = [], dead = [];
@@ -344,6 +378,6 @@
     closes: closes, highs: highs, lows: lows, vols: vols,
     SMA: SMA, EMA: EMA, RSI: RSI, CCI: CCI, MACD: MACD,
     ADX: ADX, BOLL: BOLL, ATR: ATR, TR: TR, VWMA: VWMA,
-    STOCH: STOCH, KDJ: KDJ, WILLIAMS_R: WILLIAMS_R, SUPERTREND: SUPERTREND, KELTNER: KELTNER, OBV: OBV, CHAIKIN_AD: CHAIKIN_AD, TTM: TTM, CROSS_POINTS: CROSS_POINTS
+    STOCH: STOCH, KDJ: KDJ, WILLIAMS_R: WILLIAMS_R, SUPERTREND: SUPERTREND, KELTNER: KELTNER, OBV: OBV, CHAIKIN_AD: CHAIKIN_AD, TTM: TTM, CROSS_POINTS: CROSS_POINTS, VPA: VPA
   };
 })(window);
