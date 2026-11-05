@@ -1,5 +1,7 @@
 # テクニカル指標学習アプリ (tti)
 
+公開中: https://masasikatano.github.io/tti/
+
 16のテクニカル指標(RSI・CCI・ストキャスティクス・Williams %R・KDJ・MACD・ADX・VWMA・ゴールデンクロス/デッドクロス・スーパートレンド・OBV・Chaikin A/D・VPA・BOLL・ATR・TTM Squeeze)と、市場の構造(価格分布)を見るボリュームプロファイル(Market Profile)を「目的別に整理して理解する」ためのインタラクティブな学習用Webアプリ。
 
 ## ページ構成
@@ -53,7 +55,7 @@ npx serve .
   - `simulator.js` — タブ・スライダー・データモード制御と描画
   - `marketprofile.js` — ボリュームプロファイルの集計(ビン分割・POC・バリューエリア)
 - 日本語UI・レスポンシブ対応
-- HTTP配信前提(GitHub Pages公開予定)。`file://` では開かない想定
+- HTTP配信前提(GitHub Pagesで公開中: https://masasikatano.github.io/tti/)。`file://` では開かない想定
 
 ## 画像について
 

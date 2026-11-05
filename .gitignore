@@ -1,0 +1,28 @@
+# Secrets / local env
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Logs / temp
+*.log
+*.tmp
+
+# Python (data scripts)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node (if tooling added later)
+node_modules/
+dist/
