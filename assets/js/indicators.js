@@ -37,6 +37,27 @@
     return out;
   }
 
+  // RSI(Wilder 平滑化、数値系列版)
+  function RSI_SERIES(values, period) {
+    var n = values.length;
+    var out = new Array(n).fill(null);
+    if (n <= period) return out;
+    var gain = 0, loss = 0, i;
+    for (i = 1; i <= period; i++) {
+      var d = values[i] - values[i - 1];
+      if (d >= 0) gain += d; else loss -= d;
+    }
+    var avgG = gain / period, avgL = loss / period;
+    out[period] = avgL === 0 ? 100 : 100 - 100 / (1 + avgG / avgL);
+    for (i = period + 1; i < n; i++) {
+      d = values[i] - values[i - 1];
+      avgG = (avgG * (period - 1) + Math.max(d, 0)) / period;
+      avgL = (avgL * (period - 1) + Math.max(-d, 0)) / period;
+      out[i] = avgL === 0 ? 100 : 100 - 100 / (1 + avgG / avgL);
+    }
+    return out;
+  }
+
   // RSI(Wilder 平滑化)
   function RSI(data, period) {
     var c = closes(data), n = c.length;
@@ -56,6 +77,54 @@
       out[i] = avgL === 0 ? 100 : 100 - 100 / (1 + avgG / avgL);
     }
     return out;
+  }
+
+  // ConnorsRSI 用: UpDown streak(連騰落日数。上昇日は+1累積、下落日は-1累積、同値は0)
+  function STREAK(data) {
+    var c = closes(data), n = c.length;
+    var out = new Array(n).fill(null);
+    if (!n) return out;
+    out[0] = 0;
+    for (var i = 1; i < n; i++) {
+      if (c[i] > c[i - 1]) out[i] = (out[i - 1] > 0 ? out[i - 1] : 0) + 1;
+      else if (c[i] < c[i - 1]) out[i] = (out[i - 1] < 0 ? out[i - 1] : 0) - 1;
+      else out[i] = 0;
+    }
+    return out;
+  }
+
+  // PercentRank: 当日値が過去period本中で下から何%か(0〜100)。同値は0.5として数える
+  function PERCENT_RANK(values, period) {
+    var n = values.length;
+    var out = new Array(n).fill(null);
+    for (var i = period - 1; i < n; i++) {
+      var cur = values[i], less = 0, eq = 0;
+      for (var j = i - period + 1; j <= i; j++) {
+        if (values[j] < cur) less++;
+        else if (values[j] === cur) eq++;
+      }
+      out[i] = period <= 1 ? 50 : (less + 0.5 * (eq - 1)) / (period - 1) * 100;
+    }
+    return out;
+  }
+
+  // ConnorsRSI = (RSI(終値,rsiPeriod) + RSI(streak,streakPeriod) + PercentRank(1日変化率,rankPeriod)) / 3
+  function CONNORS_RSI(data, rsiPeriod, streakPeriod, rankPeriod) {
+    var c = closes(data), n = c.length;
+    var rsiC = RSI_SERIES(c, rsiPeriod);
+    var streak = STREAK(data);
+    var rsiS = RSI_SERIES(streak, streakPeriod);
+    var roc = new Array(n).fill(null);
+    for (var i = 1; i < n; i++) roc[i] = c[i] - c[i - 1];
+    var pr = PERCENT_RANK(roc.slice(1), rankPeriod);
+    var rank = new Array(n).fill(null);
+    for (i = 1; i < n; i++) rank[i] = pr[i - 1];
+    var out = new Array(n).fill(null);
+    for (i = 0; i < n; i++) {
+      if (rsiC[i] === null || rsiS[i] === null || rank[i] === null) continue;
+      out[i] = (rsiC[i] + rsiS[i] + rank[i]) / 3;
+    }
+    return { connors: out, rsiClose: rsiC, rsiStreak: rsiS, pctRank: rank, streak: streak };
   }
 
   // CCI: 典型価(TP=(H+L+C)/3)とその期間SMAの差を、平均偏差×0.015 で割る
@@ -387,7 +456,7 @@
 
   global.Indicators = {
     closes: closes, highs: highs, lows: lows, vols: vols,
-    SMA: SMA, EMA: EMA, RSI: RSI, CCI: CCI, MACD: MACD,
+    SMA: SMA, EMA: EMA, RSI: RSI, RSI_SERIES: RSI_SERIES, STREAK: STREAK, PERCENT_RANK: PERCENT_RANK, CONNORS_RSI: CONNORS_RSI, CCI: CCI, MACD: MACD,
     ADX: ADX, BOLL: BOLL, ATR: ATR, TR: TR, VWMA: VWMA,
     STOCH: STOCH, KDJ: KDJ, WILLIAMS_R: WILLIAMS_R, SUPERTREND: SUPERTREND, KELTNER: KELTNER, OBV: OBV, CHAIKIN_AD: CHAIKIN_AD, TTM: TTM, CROSS_POINTS: CROSS_POINTS, VPA: VPA, FORCE_INDEX: FORCE_INDEX
   };

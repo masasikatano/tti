@@ -38,6 +38,27 @@
         };
       }
     },
+    connors: {
+      label: "ConnorsRSI",
+      params: [
+        { key: "rsiPeriod", label: "RSI期間", min: 2, max: 14, step: 1, def: 3, hint: "目安: 3日(Connors の標準)。終値RSIの期間。" },
+        { key: "streakPeriod", label: "Streak RSI期間", min: 2, max: 14, step: 1, def: 2, hint: "目安: 2日(Connors の標準)。連騰落日数(streak)のRSI期間。" },
+        { key: "rankPeriod", label: "Rank期間", min: 20, max: 200, step: 1, def: 100, hint: "目安: 100日(Connors の標準)。1日変化率のPercentRankの lookback。大きくすると立ち上がりが遅れる。" }
+      ],
+      priceMode: "separate",
+      fixedY: [0, 100],
+      build: function (d, p) {
+        var r = Indicators.CONNORS_RSI(d, p.rsiPeriod, p.streakPeriod, p.rankPeriod);
+        return {
+          ind: [
+            Charts.line("ConnorsRSI", r.connors, "#2563eb", { width: 2 }),
+            Charts.line("上限 90", r.connors.map(function () { return 90; }), "#dc2626", { dash: [6, 4], width: 1 }),
+            Charts.line("下限 10", r.connors.map(function () { return 10; }), "#16a34a", { dash: [6, 4], width: 1 })
+          ],
+          indTitle: "ConnorsRSI(0〜100)"
+        };
+      }
+    },
     cci: {
       label: "CCI",
       params: [{ key: "period", label: "期間", min: 5, max: 50, step: 1, def: 20, hint: "目安: 20日(Lambert のオリジナルは月次チャート向けに考案されたため、日次では14〜20日が一般的)。±100のラインはこの期間想定の定数0.015に基づく。" }],
@@ -417,7 +438,7 @@
     }
   };
   var GROUPS = [
-    { label: "オシレーター系(過熱・逆行の目安)", keys: ["rsi", "cci", "stoch", "wpr", "kdj"] },
+    { label: "オシレーター系(過熱・逆行の目安)", keys: ["rsi", "connors", "cci", "stoch", "wpr", "kdj"] },
     { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx", "vwma", "cross", "supertrend", "obv", "chad"] },
     { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr", "keltner", "ttm"] },
     { label: "出来高・需給(誰が主導しているか)", keys: ["force", "vpa"] },

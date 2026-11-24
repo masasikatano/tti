@@ -2,13 +2,13 @@
 
 公開中: https://masasikatano.github.io/tti/
 
-17のテクニカル指標(RSI・CCI・ストキャスティクス・Williams %R・KDJ・MACD・ADX・VWMA・ゴールデンクロス/デッドクロス・スーパートレンド・OBV・Chaikin A/D・VPA・BOLL・ATR・TTM Squeeze)と、市場の構造(価格分布)を見るボリュームプロファイル(Market Profile)を「目的別に整理して理解する」ためのインタラクティブな学習用Webアプリ。
+19のテクニカル指標(RSI・ConnorsRSI・CCI・ストキャスティクス・Williams %R・KDJ・MACD・ADX・VWMA・ゴールデンクロス/デッドクロス・スーパートレンド・OBV・Chaikin A/D・フォースインデックス・VPA・BOLL・ATR・ケルトナーチャネル・TTM Squeeze)と、市場の構造(価格分布)を見るボリュームプロファイル(Market Profile)を「目的別に整理して理解する」ためのインタラクティブな学習用Webアプリ。
 
 ## ページ構成
 
 | ファイル | 内容 |
 |---|---|
-| `index.html` | 分類ダッシュボード(15指標をオシレーター系・トレンド系・ボラティリティ系の3カテゴリで表示) |
+| `index.html` | 分類ダッシュボード(20項目をオシレーター系・トレンド系・ボラティリティ系・出来高・需給・市場の構造の5カテゴリで表示) |
 | `simulator.html` | シミュレーター。タブで指標を切替、`?indicator=rsi` のように直接指定も可。各指標の解説(計算式・比較表・よくある誤解)は折りたたみパネルに表示 |
 
 ダッシュボードの各カードから `simulator.html?indicator=<key>` へ直接遷移する。
@@ -20,7 +20,7 @@
 - パラメータをスライダーで変更すると指標ラインがリアルタイム変化(debounce 200ms)
 - 2ペイン構成のChart.jsチャート(価格 + 指標、hover連動)。ボリュームプロファイル選択時は3つ目のペインに横棒で価格×出来高の分布(POC・バリューエリア付き)を表示
 - 補助ライン(シグナルライン、ヒストグラム、±2σ、±DI、比較SMAなど)をすべて表示
-- 解説パネルに各指標の計算式・比較表(RSI vs CCI / BOLL vs ATR / MACD vs ADX / VWMA vs SMA / ボリュームプロファイル vs VWMA・OBV)・「よくある誤解」を表示(コンテンツは `assets/js/content.js`)
+- 解説パネルに各指標の計算式・比較表(RSI vs CCI / RSI vs ConnorsRSI / BOLL vs ATR / MACD vs ADX / VWMA vs SMA / ボリュームプロファイル vs VWMA・OBV)・「よくある誤解」を表示(コンテンツは `assets/js/content.js`)
 
 ## 起動方法
 
@@ -48,7 +48,7 @@ npx serve .
 - Chart.js はCDNから読み込み
 - `assets/css/style.css` — ハンドメイドCSS
 - `assets/js/`
-  - `indicators.js` — SMA/EMA と17指標の計算
+  - `indicators.js` — SMA/EMA と19指標の計算(RSI_SERIES/STREAK/PERCENT_RANK/CONNORS_RSI を含む)
   - `charts.js` — 2ペイン連動チャート(ボリュームプロファイル用の横棒ペイン生成も担当)
   - `data.js` — 疑似ランダムウォーク生成・実データ読み込み
   - `content.js` — 各指標の解説コンテンツ(計算式・比較表・誤解)
