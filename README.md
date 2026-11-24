@@ -2,7 +2,7 @@
 
 公開中: https://masasikatano.github.io/tti/
 
-16のテクニカル指標(RSI・CCI・ストキャスティクス・Williams %R・KDJ・MACD・ADX・VWMA・ゴールデンクロス/デッドクロス・スーパートレンド・OBV・Chaikin A/D・VPA・BOLL・ATR・TTM Squeeze)と、市場の構造(価格分布)を見るボリュームプロファイル(Market Profile)を「目的別に整理して理解する」ためのインタラクティブな学習用Webアプリ。
+17のテクニカル指標(RSI・CCI・ストキャスティクス・Williams %R・KDJ・MACD・ADX・VWMA・ゴールデンクロス/デッドクロス・スーパートレンド・OBV・Chaikin A/D・VPA・BOLL・ATR・TTM Squeeze)と、市場の構造(価格分布)を見るボリュームプロファイル(Market Profile)を「目的別に整理して理解する」ためのインタラクティブな学習用Webアプリ。
 
 ## ページ構成
 
@@ -48,7 +48,7 @@ npx serve .
 - Chart.js はCDNから読み込み
 - `assets/css/style.css` — ハンドメイドCSS
 - `assets/js/`
-  - `indicators.js` — SMA/EMA と16指標の計算
+  - `indicators.js` — SMA/EMA と17指標の計算
   - `charts.js` — 2ペイン連動チャート(ボリュームプロファイル用の横棒ペイン生成も担当)
   - `data.js` — 疑似ランダムウォーク生成・実データ読み込み
   - `content.js` — 各指標の解説コンテンツ(計算式・比較表・誤解)

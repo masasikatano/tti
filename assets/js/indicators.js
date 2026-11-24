@@ -363,6 +363,17 @@
     return { buy: buy, sell: sell, volRatio: volRatio };
   }
 
+  // Force Index(Elder): (終値−前日終値)×出来高。短期=RAW、長期=RAWのEMA
+  function FORCE_INDEX(data, emaPeriod) {
+    var c = closes(data), v = vols(data), n = data.length;
+    var raw = new Array(n).fill(null);
+    for (var i = 1; i < n; i++) raw[i] = (c[i] - c[i - 1]) * v[i];
+    var ema = EMA(raw.map(function (x) { return x === null ? 0 : x; }), emaPeriod);
+    // ウォームアップ期間(rawがnullの範囲)はEMAもnullに戻す
+    for (var j = 0; j < n; j++) if (raw[j] === null || j < emaPeriod) ema[j] = null;
+    return { raw: raw, ema: ema };
+  }
+
   // 2系列のクロス点(GC=上抜け/DC=下抜け)を {golden: [...], dead: [...]} で返す
   function CROSS_POINTS(a, b) {
     var golden = [], dead = [];
@@ -378,6 +389,6 @@
     closes: closes, highs: highs, lows: lows, vols: vols,
     SMA: SMA, EMA: EMA, RSI: RSI, CCI: CCI, MACD: MACD,
     ADX: ADX, BOLL: BOLL, ATR: ATR, TR: TR, VWMA: VWMA,
-    STOCH: STOCH, KDJ: KDJ, WILLIAMS_R: WILLIAMS_R, SUPERTREND: SUPERTREND, KELTNER: KELTNER, OBV: OBV, CHAIKIN_AD: CHAIKIN_AD, TTM: TTM, CROSS_POINTS: CROSS_POINTS, VPA: VPA
+    STOCH: STOCH, KDJ: KDJ, WILLIAMS_R: WILLIAMS_R, SUPERTREND: SUPERTREND, KELTNER: KELTNER, OBV: OBV, CHAIKIN_AD: CHAIKIN_AD, TTM: TTM, CROSS_POINTS: CROSS_POINTS, VPA: VPA, FORCE_INDEX: FORCE_INDEX
   };
 })(window);

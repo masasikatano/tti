@@ -365,6 +365,24 @@
       priceMode: "profile",
       build: null // 下ペインの折れ線チャートではなく、横棒のプロファイルペインで描画する(render で個別処理)
     },
+    force: {
+      label: "フォースインデックス",
+      params: [
+        { key: "emaPeriod", label: "EMA期間(長期)", min: 2, max: 60, step: 1, def: 13, hint: "目安: 13日(Elder の標準)。短期(2日)はRAWに近い鋭い動き、長期(13日)はトレンドの力の持続を見る。" }
+      ],
+      priceMode: "separate",
+      build: function (d, p) {
+        var r = Indicators.FORCE_INDEX(d, p.emaPeriod);
+        return {
+          ind: [
+            Charts.line("Force RAW(1本分)", r.raw, "#94a3b8", { width: 1 }),
+            Charts.line("Force EMA(" + p.emaPeriod + ")", r.ema, "#2563eb", { width: 1.8 }),
+            Charts.line("0", r.raw.map(function () { return 0; }), "#dc2626", { dash: [6, 4], width: 1 })
+          ],
+          indTitle: "フォースインデックス(RAW + EMA。※出来高は疑似生成のため参考値)"
+        };
+      }
+    },
     vpa: {
       label: "VPA",
       params: [
@@ -402,7 +420,7 @@
     { label: "オシレーター系(過熱・逆行の目安)", keys: ["rsi", "cci", "stoch", "wpr", "kdj"] },
     { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx", "vwma", "cross", "supertrend", "obv", "chad"] },
     { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr", "keltner", "ttm"] },
-    { label: "出来高・需給(誰が主導しているか)", keys: ["vpa"] },
+    { label: "出来高・需給(誰が主導しているか)", keys: ["force", "vpa"] },
     { label: "市場の構造(価格分布)", keys: ["vprofile"] }
   ];
 
@@ -431,7 +449,7 @@
         state.data = r.data;
         state.meta = r.meta;
         notice.innerHTML = "実データモード:「" + r.meta.name + "」(出典: " + r.meta.source +
-          ")の日次終値を使用中。<b>High/Low/出来高は終値から疑似生成しているため</b>、ATR/CCI/ADX/BOLL/VWMA/ストキャスティクス/KDJ/スーパートレンド/OBV/Chaikin A/D/VPAなどの水準は参考値です。";
+          ")の日次終値を使用中。<b>High/Low/出来高は終値から疑似生成しているため</b>、ATR/CCI/ADX/BOLL/VWMA/ストキャスティクス/KDJ/スーパートレンド/OBV/Chaikin A/D/フォースインデックス/VPAなどの水準は参考値です。";
         notice.style.display = "block";
         render();
       }).catch(function (e) {
