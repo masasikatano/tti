@@ -454,10 +454,26 @@
     return { golden: golden, dead: dead };
   }
 
+  // Mansfield相対力: RS=(銘柄終値÷ベンチマーク終値)の期間SMA乖離率[%]。
+  // 0より上=市場平均を上回る強さ、下=下回る弱さ。Stan Weinstein 流の定番式。
+  function MANSFIELD(priceCloses, benchCloses, period) {
+    var n = priceCloses.length;
+    var out = new Array(n).fill(null);
+    if (!benchCloses || benchCloses.length !== n) return out;
+    var rs = new Array(n);
+    for (var i = 0; i < n; i++) rs[i] = benchCloses[i] === 0 ? 0 : priceCloses[i] / benchCloses[i];
+    var ma = SMA(rs, period);
+    for (i = 0; i < n; i++) {
+      if (ma[i] === null || ma[i] === 0) continue;
+      out[i] = (rs[i] / ma[i] - 1) * 100;
+    }
+    return out;
+  }
+
   global.Indicators = {
     closes: closes, highs: highs, lows: lows, vols: vols,
     SMA: SMA, EMA: EMA, RSI: RSI, RSI_SERIES: RSI_SERIES, STREAK: STREAK, PERCENT_RANK: PERCENT_RANK, CONNORS_RSI: CONNORS_RSI, CCI: CCI, MACD: MACD,
     ADX: ADX, BOLL: BOLL, ATR: ATR, TR: TR, VWMA: VWMA,
-    STOCH: STOCH, KDJ: KDJ, WILLIAMS_R: WILLIAMS_R, SUPERTREND: SUPERTREND, KELTNER: KELTNER, OBV: OBV, CHAIKIN_AD: CHAIKIN_AD, TTM: TTM, CROSS_POINTS: CROSS_POINTS, VPA: VPA, FORCE_INDEX: FORCE_INDEX
+    STOCH: STOCH, KDJ: KDJ, WILLIAMS_R: WILLIAMS_R, SUPERTREND: SUPERTREND, KELTNER: KELTNER, OBV: OBV, CHAIKIN_AD: CHAIKIN_AD, TTM: TTM, CROSS_POINTS: CROSS_POINTS, VPA: VPA, FORCE_INDEX: FORCE_INDEX, MANSFIELD: MANSFIELD
   };
 })(window);

@@ -2,13 +2,13 @@
 
 公開中: https://masasikatano.github.io/tti/
 
-19のテクニカル指標(RSI・ConnorsRSI・CCI・ストキャスティクス・Williams %R・KDJ・MACD・ADX・VWMA・ゴールデンクロス/デッドクロス・スーパートレンド・OBV・Chaikin A/D・フォースインデックス・VPA・BOLL・ATR・ケルトナーチャネル・TTM Squeeze)と、市場の構造(価格分布)を見るボリュームプロファイル(Market Profile)を「目的別に整理して理解する」ためのインタラクティブな学習用Webアプリ。
+20のテクニカル指標(RSI・ConnorsRSI・CCI・ストキャスティクス・Williams %R・KDJ・MACD・ADX・VWMA・ゴールデンクロス/デッドクロス・スーパートレンド・OBV・Chaikin A/D・フォースインデックス・VPA・Mansfield Relative Strength・BOLL・ATR・ケルトナーチャネル・TTM Squeeze)と、市場の構造(価格分布)を見るボリュームプロファイル(Market Profile)を「目的別に整理して理解する」ためのインタラクティブな学習用Webアプリ。
 
 ## ページ構成
 
 | ファイル | 内容 |
 |---|---|
-| `index.html` | 分類ダッシュボード(20項目をオシレーター系・トレンド系・ボラティリティ系・出来高・需給・市場の構造の5カテゴリで表示) |
+| `index.html` | 分類ダッシュボード(21項目をオシレーター系・トレンド系・ボラティリティ系・出来高・需給・相対強度・市場の構造の6カテゴリで表示) |
 | `simulator.html` | シミュレーター。タブで指標を切替、`?indicator=rsi` のように直接指定も可。各指標の解説(計算式・比較表・よくある誤解)は折りたたみパネルに表示 |
 
 ダッシュボードの各カードから `simulator.html?indicator=<key>` へ直接遷移する。
@@ -48,7 +48,7 @@ npx serve .
 - Chart.js はCDNから読み込み
 - `assets/css/style.css` — ハンドメイドCSS
 - `assets/js/`
-  - `indicators.js` — SMA/EMA と19指標の計算(RSI_SERIES/STREAK/PERCENT_RANK/CONNORS_RSI を含む)
+  - `indicators.js` — SMA/EMA と20指標の計算(RSI_SERIES/STREAK/PERCENT_RANK/CONNORS_RSI・MANSFIELD を含む)
   - `charts.js` — 2ペイン連動チャート(ボリュームプロファイル用の横棒ペイン生成も担当)
   - `data.js` — 疑似ランダムウォーク生成・実データ読み込み
   - `content.js` — 各指標の解説コンテンツ(計算式・比較表・誤解)

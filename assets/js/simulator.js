@@ -15,7 +15,9 @@
     data: [],                // [{date, open, high, low, close, volume}]
     meta: null,              // 実データのメタ情報
     indicator: "rsi",
-    params: {}
+    params: {},
+    benchData: [],           // Mansfield用ベンチマーク系列(終値比較用)
+    benchSeed: 0
   };
 
   // ---- 指標定義(タブ・スライダー・描画) ----
@@ -404,6 +406,44 @@
         };
       }
     },
+    mansfield: {
+      label: "Mansfield Relative Strength",
+      params: [
+        { key: "period", label: "期間", min: 10, max: 100, step: 1, def: 30, hint: "目安: 30日(Weinstein 流の短期版。原典の週足52週≒年率平均に対応)。大きくするとゼロラインの切り替わりが遅くなる。" },
+        { key: "benchmark", label: "ベンチマーク", type: "select", options: [["market", "市場平均(疑似生成)"], ["us_sp500", "S&P500相当"], ["jp_topix", "TOPIX相当"], ["global_bond", "グローバル債券相当"]], def: "market", hint: "比較対象の市場平均。実データモードでは選択した系列の終値をベンチマークに使う。「市場平均」は銘柄とは別生成の疑似ウォーク。" }
+      ],
+      priceMode: "overlay",
+      build: function (d, p) {
+        var bench = getBenchmarkCloses(d, p);
+        var closes = d.map(function (x) { return x.close; });
+        var r = Indicators.MANSFIELD(closes, bench, p.period);
+        var zero = r.map(function () { return 0; });
+        var pos = r.map(function (v) { return v !== null && v >= 0 ? v : null; });
+        var neg = r.map(function (v) { return v !== null && v < 0 ? v : null; });
+        var up = Charts.bar("市場平均より強い期間", pos, "rgba(22,163,74,0.55)");
+        var dn = Charts.bar("市場平均より弱い期間", neg, "rgba(220,38,38,0.55)");
+        // ベンチマークは表示開始点で銘柄終値に合わせてリベース(水準差での縦潰れ防止)
+        var base = null, cb = null, i;
+        for (i = 0; i < closes.length; i++) {
+          if (closes[i] !== null && bench[i] !== null && bench[i] !== 0) { base = closes[i]; cb = bench[i]; break; }
+        }
+        var benchLine = bench.map(function (b) {
+          return (b === null || base === null || cb === null || cb === 0) ? null : b / cb * base;
+        });
+        return {
+          price: [
+            Charts.line("ベンチマーク(開始点リベース)", benchLine, "#94a3b8", { dash: [6, 4], width: 1.4 })
+          ],
+          ind: [
+            up,
+            dn,
+            Charts.line("Mansfield Relative Strength(" + p.period + ")", r, "#2563eb", { width: 2 }),
+            Charts.line("0(市場平均並み)", zero, "#94a3b8", { dash: [6, 4], width: 1 })
+          ],
+          indTitle: "Mansfield相対力[%](0より上=市場平均より強い)"
+        };
+      }
+    },
     vpa: {
       label: "VPA",
       params: [
@@ -442,6 +482,7 @@
     { label: "トレンド系(方向とその強さ)", keys: ["macd", "adx", "vwma", "cross", "supertrend", "obv", "chad"] },
     { label: "ボラティリティ系(変動の大きさ)", keys: ["boll", "atr", "keltner", "ttm"] },
     { label: "出来高・需給(誰が主導しているか)", keys: ["force", "vpa"] },
+    { label: "相対強度(市場対比)", keys: ["mansfield"] },
     { label: "市場の構造(価格分布)", keys: ["vprofile"] }
   ];
 
@@ -455,11 +496,38 @@
     };
   }
 
+  // ---- Mansfield用ベンチマーク終値 ----
+  // 実系列の選択時はモードを問わずその終値 / それ以外は銘柄とは別生成の疑似ウォーク。
+  // (比率計算のため銘柄・ベンチ間の絶対スケール差は打ち消される。下ペイン表示用にもリベースする)
+  function getBenchmarkCloses(d, p) {
+    var n = d.length;
+    var key = (p && p.benchmark && p.benchmark !== "market") ? p.benchmark : null;
+    if (key && state["bench_" + key] && state["bench_" + key].length >= n) {
+      var mult = state.mode === "real" ? 100 : 1;
+      return DataModule.tail(state["bench_" + key].map(function (x) { return x.close * mult; }), n);
+    }
+    if (!state.benchData.length || state.benchData.length !== N_POINTS) refreshRandomBench();
+    return DataModule.tail(state.benchData.map(function (x) { return x.close; }), n);
+  }
+  function refreshRandomBench() {
+    state.benchSeed++;
+    state.benchData = DataModule.generateRandomWalk(N_POINTS, { start: 10000, drift: 0.0002, vol: 0.010 });
+  }
+  function ensureRealBench(key, done) {
+    if (!key || key === "market") { done(); return; }
+    if (state["bench_" + key]) { done(); return; }
+    DataModule.loadSeries("data/series/" + key + ".json").then(function (r) {
+      state["bench_" + key] = r.data;
+      done();
+    }).catch(function () { done(); });
+  }
+
   // ---- データ取得 ----
   function loadData() {
     var notice = document.getElementById("data-notice");
     if (state.mode === "random") {
       state.data = DataModule.generateRandomWalk(N_POINTS, {});
+      refreshRandomBench();
       state.meta = null;
       notice.textContent = "疑似ランダムウォークデータ(ランダム生成)を使用中。再生成すると別系列になります。";
       notice.style.display = "block";
@@ -469,10 +537,13 @@
       DataModule.loadSeries("data/series/" + state.series + ".json").then(function (r) {
         state.data = r.data;
         state.meta = r.meta;
-        notice.innerHTML = "実データモード:「" + r.meta.name + "」(出典: " + r.meta.source +
-          ")の日次終値を使用中。<b>High/Low/出来高は終値から疑似生成しているため</b>、ATR/CCI/ADX/BOLL/VWMA/ストキャスティクス/KDJ/スーパートレンド/OBV/Chaikin A/D/フォースインデックス/VPAなどの水準は参考値です。";
-        notice.style.display = "block";
-        render();
+        var bp = state.params.mansfield && state.params.mansfield.benchmark;
+        ensureRealBench(bp, function () {
+          notice.innerHTML = "実データモード:「" + r.meta.name + "」(出典: " + r.meta.source +
+            ")の日次終値を使用中。<b>High/Low/出来高は終値から疑似生成しているため</b>、ATR/CCI/ADX/BOLL/VWMA/ストキャスティクス/KDJ/スーパートレンド/OBV/Chaikin A/D/フォースインデックス/VPAなどの水準は参考値です。";
+          notice.style.display = "block";
+          render();
+        });
       }).catch(function (e) {
         notice.textContent = "読み込みエラー: " + e.message + "(HTTPサーバー経由で開いてください)";
       });
@@ -487,6 +558,11 @@
   function render() {
     var def = DEFS[state.indicator];
     var p = state.params[state.indicator];
+    if (state.indicator === "mansfield" && p && p.benchmark && p.benchmark !== "market" && !state["bench_" + p.benchmark]) {
+      var self = this;
+      ensureRealBench(p.benchmark, function () { render.call(self); });
+      return;
+    }
     var d = currentView();
     if (state.mode === "real") {
       // 実データは基準=100の%表示。BOLL/VWMAなど上ペイン重ね指標と
@@ -654,7 +730,9 @@
         input.value = p[pd.key];
         input.addEventListener("change", function () {
           p[pd.key] = input.value;
-          renderDebounced();
+          val.textContent = fmtVal(p[pd.key], pd);
+          if (state.indicator === "mansfield" && pd.key === "benchmark") { render(); }
+          else renderDebounced();
         });
       } else {
         input = document.createElement("input");
@@ -686,7 +764,12 @@
   var vwmaSmaTouched = false;
 
   function fmtVal(v, pd) {
-    if (pd.type === "select") return v === "sma" ? "SMA" : "Wilder";
+    if (pd.type === "select") {
+      for (var i = 0; i < (pd.options || []).length; i++) {
+        if (pd.options[i][0] === v) return pd.options[i][1];
+      }
+      return String(v);
+    }
     return pd.step < 1 ? Number(v).toFixed(1) : String(v);
   }
 
